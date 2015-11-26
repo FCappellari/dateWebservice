@@ -23,7 +23,9 @@ import com.google.gson.JsonObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
+import model.Music;
 import model.Photo;
+import model.Sugestion;
 import model.User;
 import persistence.UserPersistence;
 import utils.FbApp;
@@ -76,9 +78,12 @@ public class UserController {
 			JSONObject photosJson    = getUserPhotosAsJson();						
 
 			
-			InterestController interestController =  new InterestController();
-			PlaceController    placeController =  new PlaceController();
-			PhotoController    photoController = new PhotoController();
+			InterestController    interestController =  new InterestController();
+			PlaceController       placeController =  new PlaceController();
+			PhotoController       photoController = new PhotoController();
+			PreferenceController  preferenceController = new PreferenceController();
+			
+
 			
 			List<Photo> userPhotos = photoController.getUserPhotos(photosJson, accessToken);
 			
@@ -90,11 +95,19 @@ public class UserController {
 			
 			user.setPhotos(userPhotos);
 			
-			user.setInterests(interestController.biuldInterests(placesJson.getJSONObject("tagged_places")));
+			user.setInterests(interestController.biuldInterests(placesJson.getJSONObject("tagged_places"), "tagged_places"));
 			
 			for (int i = 0; i < interestParams.size(); i++) {
-				user.getInterests().addAll((interestController.biuldInterests(interestsJson.getJSONObject(interestParams.get(i)))));
+				try{
+					user.getInterests().addAll(interestController.biuldInterests(interestsJson.getJSONObject(interestParams.get(i)), (interestParams.get(i))));
+				}catch(JSONException e){
+					System.out.print("AQUI È NOIS");
+				}
 			}		
+			
+			List<Music> music = preferenceController.getMusic(user.getInterests(), accessToken);
+			
+			user.setMusic(music);
 			
 			//user.setPicture(convertPicToByte(getUserPicture()));		
 			
@@ -161,8 +174,8 @@ public class UserController {
 			
 			interestParams = new ArrayList<String>();			 
 			interestParams.add("music");
-			interestParams.add("likes");			
-			interestParams.add("posts");
+			interestParams.add("movies");			
+			interestParams.add("books");
 			//interestParams.add("sports");
 			
 			return interestParams;
@@ -210,7 +223,11 @@ public class UserController {
 		public String getUserProfleById(long id) throws JSONException {
 			
 			User user = db.findById(id);
+			SugestionController sugestionController = new SugestionController();
 			
+			List<Sugestion> sugestions = sugestionController.getUserSugestion(user);
+			
+						
 			JSONObject profileJson = getProfile(user);
 									
 			return profileJson.toString();

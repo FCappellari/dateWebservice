@@ -22,7 +22,7 @@ import utils.Util;
 
 public class InterestController {	
 	
-	public List<Interest> biuldInterests(JSONObject interests) throws JSONException {
+	public List<Interest> biuldInterests(JSONObject interests, String preference) throws JSONException {
 		
 		JSONArray data;	
 		Interest interest = null;
@@ -35,7 +35,7 @@ public class InterestController {
 			
 			// representa cada intem do array data (blocao)
 			Interest main = new Interest();
-			main.setName("tagged_places_" + String.valueOf(i));
+			main.setName(preference);
 			//cada atributo do interesse 
 	        while(keys.hasNext() ){	        	
 	        	String key = (String)keys.next();	        	

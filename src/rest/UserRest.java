@@ -63,11 +63,11 @@ public class UserRest {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response crunchifyREST(String j) throws IOException, JSONException{		
 		
-		  Login login = new Gson().fromJson(j, Login[].class); 
+		  //Login login = new Gson().fromJson(j, Login[].class); 
 		  
+		  JSONObject json = new JSONObject(j);
 		  
-		  
-		  if(!controller.hasUser(login.getId("id")))
+		  if(!controller.hasUser(json.getLong("id")))
 			  controller.createUserJson(json.getString("accessToken"));
 		  
 		  return Response.status(200).build();

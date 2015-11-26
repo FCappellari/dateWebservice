@@ -93,6 +93,55 @@ public class FbApp {
 		return url;		
 	}
 	
+	public static String buildUrl(String[] params, String accessToken, String id){		
+		
+		boolean lgFirstParam = true;
+		
+		String url = "https://graph.facebook.com/" +
+	                 version + "/" +
+				     ""+id+"?fields=";
+		
+		for (String p : params) {
+			if(lgFirstParam){
+				url = url + p;
+				lgFirstParam = false;
+			} else {				
+				url = url + "%2C" + p;				
+			}			
+		}
+		
+		url = url + "&access_token=" + accessToken;	                 
+		
+		return url;		
+	}
+	
+	public static String buildUrlDebug(String[] params, String accessToken, String id) throws IOException{		
+		
+		boolean lgFirstParam = true;
+		
+		String url = "https://graph.facebook.com/" +
+	                 version + "/" +
+				     ""+id+"?fields=";
+		String url2;
+		
+		for (String p : params) {
+			if(lgFirstParam){
+				url = url + p;
+				lgFirstParam = false;
+				url2 = url + "&access_token=" + accessToken;
+				httpGetRequest(url2);
+			} else {				
+				url = url + "%2C" + p;
+				url2 = url  + "&access_token=" + accessToken;
+				httpGetRequest(url2);
+			}			
+		}
+		
+		url = url + "&access_token=" + accessToken;	                 
+		
+		return url;		
+	}
+	
 	public static JSONObject httpGetRequest(String urlString) throws IOException{
 		
 		JSONObject result = null;

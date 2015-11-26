@@ -59,6 +59,8 @@ public class User{
     
     @Embedded
     private List<Photo> photos;
+    @Embedded
+    private List<Music> music;
     
     @Transient
     private String accessToken;
@@ -164,5 +166,13 @@ public class User{
 
 	public List<Photo> getPhotos() {
 		return photos;
+	}
+
+	public List<Music> getMusic() {
+		return music;
+	}
+
+	public void setMusic(List<Music> music) {
+		this.music = music;
 	}
 }
