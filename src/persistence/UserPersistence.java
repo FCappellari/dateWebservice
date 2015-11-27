@@ -97,14 +97,12 @@ public class UserPersistence extends BasicDAO<User, String> {
 	private List<User> findUserBySetting(Setting set){
 		List<User> result = new ArrayList<User>();
 		
-		if (set.getSexPreference().toString() == "AMBOS"){
+		if (set.getSexPreference().toString() == "BOTH"){
 			result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).asList();
 		}
-		else result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).filter("gender =", set.getSexPreference().toString()).asList();
-		
+		else result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).filter("gender =", set.getSexPreference().toString()).asList();		
 		
 		return result;	
-		
 	}
 	
 	

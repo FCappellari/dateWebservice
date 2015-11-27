@@ -13,7 +13,7 @@ public class Setting {
 	private SexPreference sexPreference;
 	
 	public enum SexPreference {
-	    HOMEM, MULHER, AMBOS;	
+	    MALE, FEMALE, BOTH;	
     }
 	
 	public void setSexPreference(SexPreference value){

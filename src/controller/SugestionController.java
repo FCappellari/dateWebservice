@@ -40,7 +40,7 @@ public class SugestionController {
 
 	private List<Sugestion> getPotentialUsers() {
 		// TODO Auto-generated method stub
-		List<User> users = db.findAll();
+		List<User> users = db.findUserBySetting();
 		List<Music> currentMusics = current.getMusic();
 		Sugestion sugestion = null;
 		List<User> potentialUsers = new ArrayList<User>();
