@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.faces.view.Location;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +29,7 @@ public class PlaceController {
 			place.setId(Long.parseLong(node.getString("id")));
 			place.setCreated_time(node.getString("created_time"));
 			
-			GeoLocal location = gc.biuldLocation(node.getJSONObject("place"));
+			GeoLocal location = gc.buildLocation(node.getJSONObject("place"));
 			
 			place.setLocation(location);
 			

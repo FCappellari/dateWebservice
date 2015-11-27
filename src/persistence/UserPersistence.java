@@ -5,6 +5,7 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 
 import model.Interest;
+import model.Setting;
 import model.User;
 import utils.Util;
 
@@ -64,11 +65,8 @@ public class UserPersistence extends BasicDAO<User, String> {
 		return ds.find(User.class).asList();		
 	}
 	
-	private String update(User user){
-		
-		
+	private String update(User user){		
 		return "";
-		
 	}
 	
 	private boolean delete(int id){
@@ -94,6 +92,22 @@ public class UserPersistence extends BasicDAO<User, String> {
 			return false;
 		return true;				
 	}
+	
+	
+	private List<User> findUserBySetting(Setting set){
+		List<User> result = new ArrayList<User>();
+		
+		if (set.getSexPreference().toString() == "AMBOS"){
+			result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).asList();
+		}
+		else result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).filter("gender =", set.getSexPreference().toString()).asList();
+		
+		
+		return result;	
+		
+	}
+	
+	
 }
 
 

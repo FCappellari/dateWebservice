@@ -8,7 +8,7 @@ import model.GeoLocal;
 
 public class GeoLocationController {
 
-	public GeoLocal biuldLocation(JSONObject json) throws JSONException {
+	public GeoLocal buildLocation(JSONObject json) throws JSONException {
 		
 		GeoLocal local =  new GeoLocal();			
 		JSONArray data = json.getJSONArray("place");

@@ -29,8 +29,12 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/java-json.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gson-2.4.jar" sourcepath="C:/Users/Edian/.m2/repository/com/google/code/gson/gson/2.4/gson-2.4-sources.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mongo2gson-1.0.2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/morphia-1.0.1-javadoc.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/morphia-1.0.1.jar" sourcepath="C:/Users/Edian/.m2/repository/org/mongodb/morphia/morphia/1.0.1/morphia-1.0.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/morphia-1.0.1-javadoc.jar"/>
+	<classpathentry exported="true" kind="lib" path="WebContent/WEB-INF/lib/morphia-1.0.1.jar" sourcepath="C:/Users/Edian/.m2/repository/org/mongodb/morphia/morphia/1.0.1/morphia-1.0.1-sources.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/spring-data-jpa-1.7.0.RELEASE.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mongo-java-driver-3.1.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.ws.rs-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-json-1.19.jar"/>
+	<classpathentry kind="lib" path="C:/BitBucket/Date V1/WebContent/WEB-INF/lib/mongo-java-driver-3.1.0.jar" sourcepath="C:/Users/Fabrício/.m2/repository/org/mongodb/mongo-java-driver/3.1.0/mongo-java-driver-3.1.0-sources.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

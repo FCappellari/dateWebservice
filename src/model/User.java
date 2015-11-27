@@ -47,9 +47,10 @@ public class User{
     
     private long fbId;
     private String name;
+    private int age;
     private String gender; 
     private long locationId;
-    private String location;   
+    private String location;
     
     private byte[] picture;  
     private String pictureUrl; 
@@ -59,6 +60,10 @@ public class User{
     
     @Embedded
     private List<Photo> photos;
+    
+    @Embedded
+    private Setting setting;
+    
     @Embedded
     private List<Music> music;
     
@@ -174,5 +179,13 @@ public class User{
 
 	public void setMusic(List<Music> music) {
 		this.music = music;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
 	}
 }
