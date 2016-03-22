@@ -94,7 +94,7 @@ public class UserPersistence extends BasicDAO<User, String> {
 	}
 	
 	
-	private List<User> findUserBySetting(Setting set){
+	public List<User> findUserBySetting(Setting set){
 		List<User> result = new ArrayList<User>();
 		
 		if (set.getSexPreference().toString() == "BOTH"){

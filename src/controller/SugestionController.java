@@ -25,6 +25,7 @@ public class SugestionController {
 	static Datastore ds = morphia.createDatastore(client, "teste");
     private Gson gson = new Gson(); 
     private static UserPersistence db = new UserPersistence(ds);
+    private SettingController st = new SettingController();
     private String accessToken;
     private ArrayList<String> interestParams;
     private static User current;
@@ -40,7 +41,7 @@ public class SugestionController {
 
 	private List<Sugestion> getPotentialUsers() {
 		// TODO Auto-generated method stub
-		List<User> users = db.findUserBySetting();
+		List<User> users = db.findUserBySetting(st.findSetting(current));
 		List<Music> currentMusics = current.getMusic();
 		Sugestion sugestion = null;
 		List<User> potentialUsers = new ArrayList<User>();

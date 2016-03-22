@@ -188,4 +188,12 @@ public class User{
 	public void setAge(int age) {
 		this.age = age;
 	}
+
+	public Setting getSetting() {
+		return setting;
+	}
+
+	public void setSetting(Setting setting) {
+		this.setting = setting;
+	}
 }

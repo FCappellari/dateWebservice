@@ -16,6 +16,8 @@ public class GeoLocationController {
 		for (int i = 0; i < data.length(); i++) {
 			
 		}
+		
+		return local;
 	}
 
 }
