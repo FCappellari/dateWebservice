@@ -15,8 +15,8 @@ import org.json.JSONObject;
 
 public class FbApp {
 	
-	private static long appId = 182608422078754L;
-	private static String appSecret = "d1dde6da5001f419ab0d5bb33f8599e3";	
+	private static long appId = 973158726110069L;
+	private static String appSecret = "d6da159210c713c50c11164e759e2f5d";	
 	private static String version = "v2.5";
 	 
 	private static FbApp instancia; //Declaramos um objeto privado e estático 'instancia'  

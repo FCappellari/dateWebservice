@@ -51,6 +51,7 @@ public class User{
     private String gender; 
     private long locationId;
     private String location;
+    private String location;   
     
     private byte[] picture;  
     private String pictureUrl; 
@@ -63,9 +64,11 @@ public class User{
     
     @Embedded
     private Setting setting;
+    private List<Music> music;
     
     @Embedded
     private List<Music> music;
+    private List<Sugestion> sugestions;
     
     @Transient
     private String accessToken;
@@ -191,9 +194,13 @@ public class User{
 
 	public Setting getSetting() {
 		return setting;
+	public List<Sugestion> getSugestions() {
+		return sugestions;
 	}
 
 	public void setSetting(Setting setting) {
 		this.setting = setting;
+	public void setSugestions(List<Sugestion> sugestions) {
+		this.sugestions = sugestions;
 	}
 }

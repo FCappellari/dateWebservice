@@ -58,6 +58,13 @@ public class UserRest {
 		return controller.getUserProfleById(id);
 	}
 	
+	@GET
+	@Path("/{id:[0-9][0-9]*}/sugestions")	
+	public String getUserSugestoinsById(@PathParam("id") long id) throws JSONException{ 
+		
+		return controller.getUserSugestoinsById(id).toString();
+	}
+	
 	@POST
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)

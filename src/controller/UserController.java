@@ -1,9 +1,8 @@
 package controller;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
+
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class UserController {
 		static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
@@ -241,5 +241,33 @@ public class UserController {
 		
 		private JSONObject getUserPhotosAsJson() throws IOException{
 			return FbApp.httpGetRequest(FbApp.biuldPhotosUrl(accessToken));
+		}
+
+		public JSONArray getUserSugestoinsById(long id) throws JSONException {
+
+			User current = db.findById(id);
+			SugestionController sugestionController = new SugestionController();
+			List<Sugestion> sugestions = null;
+			List<String> sugestionResult = new ArrayList<String>();
+			
+			
+			if((current.getSugestions()==null)||current.getSugestions().isEmpty()){
+				sugestions = sugestionController.getUserSugestion(current);
+			}else{
+				sugestions = current.getSugestions();
+			}
+			
+			JSONArray sugestionsJson = new JSONArray();	
+			
+			for (Sugestion sugestion : sugestions) {				
+				JSONObject my_obj = new JSONObject();
+				my_obj.put("id", sugestion.getUser().getFbId());
+				my_obj.put("name", sugestion.getUser().getName());
+				my_obj.put("interestsInCommon", sugestion.getPreferencesInConnom());
+				my_obj.put("photos", sugestion.getUser().getPictureUrl());
+				sugestionsJson.put(my_obj);
+			}			
+			
+			return sugestionsJson;
 		}
 }
