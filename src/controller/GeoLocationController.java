@@ -13,8 +13,6 @@ public class GeoLocationController {
 		GeoLocal local =  new GeoLocal();			
 		JSONArray data = json.getJSONArray("place");
 		
-		//comentario teste branch
-		
 		for (int i = 0; i < data.length(); i++) {
 			
 		}
