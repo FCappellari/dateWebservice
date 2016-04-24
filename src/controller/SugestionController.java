@@ -41,7 +41,7 @@ public class SugestionController {
 
 	private List<Sugestion> getPotentialUsers() {
 		// TODO Auto-generated method stub
-		List<User> users = db.findUserBySetting(st.findSetting(current));
+		//List<User> users = db.findUserBySetting(st.findSetting(current));
 		List<User> users = db.findAll();
 		List<Music> currentMusics = current.getMusic();
 		Sugestion sugestion = null;
@@ -65,7 +65,22 @@ public class SugestionController {
 								potentialUsers.add(user);
 								sugestionsList.add(sugestion);	
 							}
+						}else{
+							/* retirar tudo do else
+							 * trecho implementado para pegar todos os usuarios
+							 */
+							if(!potentialUsers.contains(user)){
+								
+								sugestion = new Sugestion();
+								
+								sugestion.setUser(user);
+							    sugestion.setPreferencesInConnom(currentMusic.getName()+";");
+							    //sugestion.setPercentage(percentage);
+								potentialUsers.add(user);
+								sugestionsList.add(sugestion);	
+							}
 						}
+							
 					}
 				}
 			}

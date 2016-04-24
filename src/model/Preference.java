@@ -21,7 +21,7 @@ abstract class Preference {
 	private boolean can_checkin;
 	private boolean can_post;
 	private String category;
-	private List<Category> category_list;
+	//private List<Category> category_list;
 	private String company_overview;;
 	private String country_page_likes;
 	private String culinary_team;
@@ -196,12 +196,14 @@ abstract class Preference {
 	public void setCategory(String category) {
 		this.category = category;
 	}
+	/*
 	public List<Category> getCategory_list() {
 		return category_list;
 	}
 	public void setCategory_list(List<Category> category_list) {
 		this.category_list = category_list;
 	}
+	*/
 	public String getCompany_overview() {
 		return company_overview;
 	}

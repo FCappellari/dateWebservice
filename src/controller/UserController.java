@@ -130,7 +130,7 @@ public class UserController {
 			userProfileJson.put("gender", user.getGender());
 			userProfileJson.put("location", user.getLocation());
 			userProfileJson.put("pictureUrl", user.getPictureUrl());			
-			//userProfileJson.put("coverPicUrl", user.getCoverPictureUrl());			
+			userProfileJson.put("coverPicUrl", user.getCoverPictureUrl());			
 			
 			userProfileJson.put("photos", getUserPhotos(user));
 			
@@ -264,7 +264,7 @@ public class UserController {
 				my_obj.put("id", sugestion.getUser().getFbId());
 				my_obj.put("name", sugestion.getUser().getName());
 				my_obj.put("interestsInCommon", sugestion.getPreferencesInConnom());
-				my_obj.put("photos", sugestion.getUser().getPictureUrl());
+				my_obj.put("photos", sugestion.getUser().getPhotos().get(0).getSizes().get(0).getUrl());
 				sugestionsJson.put(my_obj);
 			}			
 			
