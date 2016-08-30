@@ -22,6 +22,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -46,7 +47,10 @@ public class UserPersistence extends BasicDAO<User, String> {
 		// TODO Auto-generated constructor stub
 	}
     
-	public boolean CreateUser(User user){	
+	public boolean CreateUser(User user){		
+		
+		if(hasUser(user.getFbId()))
+			return false;
 		
 		Key<User> save = ds.save(user);
 		
@@ -63,11 +67,7 @@ public class UserPersistence extends BasicDAO<User, String> {
 	}
 	public List<User> findAll(){		
 		return ds.find(User.class).asList();		
-	}
-	
-	private String update(User user){		
-		return "";
-	}
+	}	
 	
 	private boolean delete(int id){
 		
@@ -104,8 +104,34 @@ public class UserPersistence extends BasicDAO<User, String> {
 		
 		return result;	
 	}
+
+	public boolean updateUser(long id, User user) {	
+
+		Query<User> updateQuery = ds.createQuery(User.class).field("fbId").equal(id);
+		
+		ds.findAndDelete(updateQuery);
+		ds.save(user);
+		
+		return true;		
+	}
+	public boolean updateUserLastLogin(long id){
+		UpdateOperations<User> ops;
+		ops = ds.createUpdateOperations(User.class).set("lastLogin", new Date());
 	
-	
+		// morphia default update is to update all the hotels
+		ds.update(ds.createQuery(User.class).field("fbId").equal(id), ops);  //increments all hotels
+		return false;
+	}
+
+	public boolean updateUser(User user) {
+		Query<User> updateQuery = ds.createQuery(User.class).field("fbId").equal(user.getFbId());
+		
+		ds.findAndDelete(updateQuery);
+		ds.save(user);
+		
+		return true;
+		
+	}	
 }
 
 

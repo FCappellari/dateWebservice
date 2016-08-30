@@ -17,7 +17,9 @@
 package model;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Property;
+import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
 import org.bson.types.ObjectId;
 
@@ -54,22 +57,27 @@ public class User{
     
     private byte[] picture;  
     private String pictureUrl; 
-    private String coverPictureUrl;
+    private String coverPictureUrl;    
+    @Embedded
+    private Setting setting;
+    
     @Embedded
     private List<Interest> interests;     
     
     @Embedded
-    private List<Photo> photos;
-    
-    @Embedded
-    private Setting setting;
+    private List<Photo> photos;    
+
     private List<Music> music;
     
     @Embedded    
     private List<Sugestion> sugestions;
     
     @Transient
-    private String accessToken;
+    private String accessToken;   
+    
+    private Date lastLogin;    
+    
+    private List<UserSocialLink> socialLinks;
         
     public User(){};       
     
@@ -202,5 +210,21 @@ public class User{
 	}
 	public void setSugestions(List<Sugestion> sugestions) {
 		this.sugestions = sugestions;
+	}
+
+	public Date getLastLogin() {
+		return lastLogin;		
+	}
+
+	public void setLastLogin(Date lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+
+	public List<UserSocialLink> getSocialLinks() {
+		return socialLinks;
+	}
+
+	public void setSocialLinks(List<UserSocialLink> socialLinks) {
+		this.socialLinks = socialLinks;
 	}
 }

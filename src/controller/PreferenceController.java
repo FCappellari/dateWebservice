@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONException;
@@ -32,7 +33,7 @@ public class PreferenceController {
 		List<String> ids = new ArrayList<String>();
 		
 		//FbApp.buildUrl(params, accessToken, id);
-		
+		System.out.println("PreferenceController " +new Date().toString());
 		for (Interest i : interests) {
 			if(i.getName().equals("music")){
 				for (Interest j : i.getChildren()) {
@@ -42,11 +43,12 @@ public class PreferenceController {
 				}
 			}	
 		}
-		
+		System.out.println("PreferenceController " +new Date().toString());
 		for (String id : ids) {
 			String url = FbApp.buildUrl(params, accessToken, id);
 			listMusic.add(getMusic(FbApp.httpGetRequest(url)));
 		}
+		System.out.println("PreferenceController " +new Date().toString());
 		return listMusic;		
 	}
 

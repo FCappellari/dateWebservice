@@ -11,6 +11,7 @@ public class Photo{
 	private long id;	
 	private int index;
 	private int likes;
+	private String url;
 	private List<Size> sizes;
 	
 	public long getId() {
@@ -37,6 +38,12 @@ public class Photo{
 	}
 	public void setSizes(List<Size> sizes) {
 		this.sizes = sizes;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 }

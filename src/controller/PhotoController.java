@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -28,8 +29,9 @@ public class PhotoController {
 		}
 		
 		//get the size and urls of the photos
+		System.out.println("getUserPhotos " + new Date().toString());
 		topTenPhotos = getTopTenPhotosUrls(topTenPhotos, accessToken);		
-		
+		System.out.println("getUserPhotos2 " + new Date().toString());
 		return topTenPhotos;
 	}
 	
