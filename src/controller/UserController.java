@@ -71,16 +71,14 @@ public class UserController {
 			JSONObject placesJson    = getUserPlacesAsJson(placeParams);
 			JSONObject pictureJson   = getUserPictureAsJson();
 			JSONObject coverPicJson  = getUserPictureCoverAsJson("cover");
-			JSONObject photosJson    = getUserPhotosAsJson();
+			
 			
 			InterestController    interestController =  new InterestController();
 			PlaceController       placeController =  new PlaceController();
 			PhotoController       photoController = new PhotoController();
 			PreferenceController  preferenceController = new PreferenceController();
 			
-			System.out.println(new Date().toString());
-			
-			List<Photo> userPhotos = photoController.getUserPhotos(photosJson, accessToken);
+			System.out.println(new Date().toString());		
 			
 			System.out.println(new Date().toString());
 			
@@ -96,7 +94,7 @@ public class UserController {
 			user.setFbId(basicDataJson.getLong("id"));
 			user.setGender(basicDataJson.getString("gender"));			
 			System.out.println(new Date().toString());
-			user.setPhotos(userPhotos);
+			
 			
 			user.setInterests(interestController.biuldInterests(placesJson.getJSONObject("tagged_places"), "tagged_places"));
 			System.out.println(new Date().toString());
@@ -133,15 +131,30 @@ public class UserController {
 			return user;	    	
 	    }
 	    
+	    public List<Photo> getTopTenUserPhotosFromFb() throws JSONException, IOException{
+	    	
+	    	JSONObject photosJson  = getUserPhotosAsJson();
+	    	
+	    	List<Photo> userPhotos = new PhotoController().getUserPhotos(photosJson, accessToken);
+	    	
+	    	return userPhotos;	    	
+	    }
+	    
 		public boolean createUserJson(String shortAccessToken) throws IOException, JSONException {
 			  
 			accessToken = extendAccessToken(shortAccessToken);
-			//mudar para get
+			
+			/* 
+			 * prepareUser()
+			 * metodo comum para processos de criacao e atualizacao do usuario
+			 * Processos especificos de criação ou atualização devem ser colocados 
+			 * fora do metodo prepareUser 
+			 */			
 			User user = prepareUser(null);
 			
 			List<SocialLink> socialLinks;
 			SocialLinkController scc = new SocialLinkController();
-			
+			user.setPhotos(getTopTenUserPhotosFromFb());
 			//user.setSocialLinks(scc.getFirstSocialLink());
 			
 			boolean hasCreated = db.CreateUser(user);
@@ -198,7 +211,17 @@ public class UserController {
 			JSONArray photosJson = new JSONArray();
 			
 			for (Photo photo : photos) {
-				photosJson.put(photo.getSizes().get(0).getUrl());
+				
+				/*
+				 * Se o campo base64 esta nao vazio quer dizer que o usuario ja
+				 * atualizaou a foto entao deve considerar a foto que o usuario atualizou 
+				 * e nao a URL da foto do facebook
+				 */		
+				if((photo.getBase64()!= null)&&(!photo.getBase64().equals(""))){
+					photosJson.put(photo.getBase64());
+				}else{
+					photosJson.put(photo.getSizes().get(0).getUrl());
+				}
 			}
 			
 			return photosJson;
@@ -480,5 +503,21 @@ public class UserController {
 			socialLinks.addAll(u.getSocialLinks());
 			
 			return socialLinksToJson(socialLinks).toString();						
+		}
+
+		public boolean updatePhoto(JSONObject j) throws Exception{
+			
+			PhotoController pcc = new PhotoController();
+
+			User u = db.findById(j.getLong("userId"));			
+			
+			int index = j.getInt("index");
+			String base64 = j.getString("imageBase64");
+			
+			u.setPhotos(pcc.updatePhoto(index, base64, u.getPhotos()));
+			
+			db.updateUser(u);
+			
+			return true;
 		}
 }

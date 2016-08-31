@@ -12,7 +12,8 @@ public class Photo{
 	private int index;
 	private int likes;
 	private String url;
-	private List<Size> sizes;
+	private List<Size> sizes;	
+	private String base64;
 	
 	public long getId() {
 		return id;
@@ -44,6 +45,12 @@ public class Photo{
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public String getBase64() {
+		return base64;
+	}
+	public void setBase64(String base64) {
+		this.base64 = base64;
 	}
 	
 }

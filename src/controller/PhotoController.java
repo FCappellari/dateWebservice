@@ -1,5 +1,8 @@
 package controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,12 +13,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
+
 import model.Photo;
 import model.Size;
 import utils.CustomComparator;
 import utils.FbApp;
 
 public class PhotoController {
+	
+	static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
+	static MongoClient client = new MongoClient(uri);	
+	
+	@SuppressWarnings("deprecation")
+	DB db = client.getDB(uri.getDatabase());
 
 	public List<Photo> getUserPhotos(JSONObject json, String accessToken) throws JSONException, IOException {
 		
@@ -85,5 +102,54 @@ public class PhotoController {
 		}		
 		return list;		
 	}
+	
+	public List<Photo> updatePhoto(int index, String base64, List<Photo> photos){
+		int i = 0;		
+		
+		for (Photo p : photos) {
+			if(i==index){
+				p.setUrl("");
+				p.setBase64(base64);
+			}
+			i++;
+		}
+		return photos;
+	}
+	
+/*
+ * Metodo responsavel por tratar as imagens de forma binaria
+ * **Descontinuado**
+ * 
+    public byte[] LoadImage(String filePath) throws Exception {
 
+    	File file = new File(filePath);
+        int size = (int)file.length();
+        byte[] buffer = new byte[size];
+        FileInputStream in = new FileInputStream(file);
+        in.read(buffer);
+        in.close();
+        return buffer;
+        
+    }
+    
+    public boolean saveImage(byte[] image) throws Exception {
+    
+    	byte[] imageBytes = image;	        	        
+        
+        //Create GridFS object
+        GridFS fs = new GridFS( db );
+        //Save image into database
+        GridFSInputFile in = fs.createFile( imageBytes );
+        in.save();
+        //Find saved image
+        GridFSDBFile out = fs.findOne( new BasicDBObject( "_id" , in.getId() ) );
+        //Save loaded image from database into new image file
+        FileOutputStream outputImage = new FileOutputStsream("C:/Temp/bearCopy.bmp");
+        out.writeTo( outputImage );
+        outputImage.close();
+        
+		return false;
+    }
+*/
+	
 }

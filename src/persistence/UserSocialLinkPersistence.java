@@ -29,9 +29,10 @@ public class UserSocialLinkPersistence extends BasicDAO<UserSocialLink, String>{
 		
 		ArrayList<UserSocialLink> result = new ArrayList<>();  
 		
-		for (UserSocialLink usl : u.getSocialLinks()) {
-			result.add(getDs().get(UserSocialLink.class, usl.getId()));
-		}
+		if(u.getSocialLinks()!=null)		
+			for (UserSocialLink usl : u.getSocialLinks()) {
+				result.add(getDs().get(UserSocialLink.class, usl.getId()));
+			}
 		
 		return result;		
 	}

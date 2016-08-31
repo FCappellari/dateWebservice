@@ -1,7 +1,10 @@
 package model;
 
+import org.mongodb.morphia.annotations.Reference;
+
 public class Sugestion {
 	
+	@Reference
 	private User user;
 	private int percentage;
 	private String preferencesInConnom;

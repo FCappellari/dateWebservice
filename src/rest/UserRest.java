@@ -138,6 +138,22 @@ public class UserRest {
 		else return Response.status(500).build();	
 		
 	}
+	
+	@POST
+	@Path("/updatePhoto")	
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updatePhoto(String param) throws IOException, JSONException{ 
+		JSONObject j = new JSONObject(param);
+		
+		try {
+			if(controller.updatePhoto(j))
+					return Response.status(200).build();
+			else return Response.status(500).build();
+		} catch (Exception e) {
+			return Response.status(500).build();
+		}	
+		
+	}
 } 
 
 
