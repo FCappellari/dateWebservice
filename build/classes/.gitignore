@@ -1,3 +1,5 @@
-/model/
 /controller/
+/model/
+/persistence/
 /rest/
+/utils/

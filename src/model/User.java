@@ -53,7 +53,8 @@ public class User{
     private int age;
     private String gender; 
     private long locationId;
-    private String location;       
+    private String location;  
+    private String bio;
     
     private byte[] picture;  
     private String pictureUrl; 
@@ -226,5 +227,13 @@ public class User{
 
 	public void setSocialLinks(List<UserSocialLink> socialLinks) {
 		this.socialLinks = socialLinks;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
 	}
 }

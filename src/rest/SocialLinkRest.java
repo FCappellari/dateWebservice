@@ -23,7 +23,7 @@ public class SocialLinkRest {
 
 	@GET  
 	@Path("/getSocialLinks")		
-	public String findAllSocialLinks(){ 
+	public String findAllSocialLinks() throws JSONException{ 
 		return controller.findAllSocialLinks().toString();
 	} 
 	

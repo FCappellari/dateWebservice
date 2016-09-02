@@ -55,7 +55,7 @@ public class UserController {
 	    	return gson.toJson(users);	    	      
 	    }	
 
-	    private User prepareUser(Long id) throws IOException{
+	    private User prepareUser(Long id) throws IOException, JSONException{
 	    	
 	    	//SocialLinkController scc = new SocialLinkController();	    			
 	    	
@@ -186,6 +186,7 @@ public class UserController {
 			userProfileJson.put("pictureUrl", user.getPictureUrl());			
 			userProfileJson.put("coverPicUrl", user.getCoverPictureUrl());					
 			userProfileJson.put("photos", getUserPhotos(user));
+			userProfileJson.put("bio", user.getBio());
 			
 			JSONArray arraySc = new JSONArray();
 			JSONObject jsc = new JSONObject();
@@ -391,7 +392,7 @@ public class UserController {
 		    return false;
 		}	
 		
-		public boolean updateUserSettings(JSONObject j, String string) {
+		public boolean updateUserSettings(JSONObject j, String string) throws JSONException {
 			// TODO Auto-generated method stub
 			Setting setting = new Setting();
 			JSONObject Jsettings = j.getJSONObject("settings");
@@ -418,7 +419,7 @@ public class UserController {
 			return true;
 		}
 
-		public String getUserSettings(long id) {
+		public String getUserSettings(long id) throws JSONException {
 			
 			User u = db.findById(id);
 			Setting s = u.getSetting();
@@ -440,7 +441,7 @@ public class UserController {
 			
 		}
 
-		public boolean createSocialLink(JSONObject j) {
+		public boolean createSocialLink(JSONObject j) throws JSONException {
 			
 			SocialLinkController scc = new SocialLinkController();
 			
@@ -473,7 +474,7 @@ public class UserController {
 			return false;
 		}
 		
-		private JSONObject socialLinksToJson(ArrayList<UserSocialLink> socialLinks){
+		private JSONObject socialLinksToJson(ArrayList<UserSocialLink> socialLinks) throws JSONException{
 			
 			JSONObject j = new JSONObject(); 
 			JSONArray jsArray = new JSONArray();
@@ -494,7 +495,7 @@ public class UserController {
 			return j;		
 		}
 
-		public String getSocialLinks(long id) {
+		public String getSocialLinks(long id) throws JSONException {
 			User u = db.findById(id);
 			
 			ArrayList<UserSocialLink> socialLinks = new ArrayList<UserSocialLink>();
@@ -515,6 +516,18 @@ public class UserController {
 			String base64 = j.getString("imageBase64");
 			
 			u.setPhotos(pcc.updatePhoto(index, base64, u.getPhotos()));
+			
+			db.updateUser(u);
+			
+			return true;
+		}
+
+		public boolean updateUserBio(JSONObject j) throws JSONException {
+			// TODO Auto-generated method stub
+			
+			User u = db.findById(j.getLong("userId"));
+			
+			u.setBio(j.getJSONObject("profile").getString("bio"));
 			
 			db.updateUser(u);
 			

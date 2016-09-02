@@ -154,6 +154,18 @@ public class UserRest {
 		}	
 		
 	}
+	
+	@POST
+	@Path("/updateUserBio")	
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateUserBio(String param) throws IOException, JSONException{ 
+		JSONObject j = new JSONObject(param);
+		
+		if(controller.updateUserBio(j))
+				return Response.status(200).build();
+		else return Response.status(500).build();	
+		
+	}
 } 
 
 

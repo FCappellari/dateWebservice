@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
@@ -47,7 +48,7 @@ public class SocialLinkController {
 		db.saveSocialLinkTeste();
 	}
 
-	private JSONObject socialLinksToJson(ArrayList<SocialLink> sll){
+	private JSONObject socialLinksToJson(ArrayList<SocialLink> sll) throws JSONException{
 		
 		JSONObject j = new JSONObject(); 
 		JSONArray jsArray = new JSONArray();
@@ -65,7 +66,7 @@ public class SocialLinkController {
 		return j;		
 	}
 	
-	public String findAllSocialLinks() {
+	public String findAllSocialLinks() throws JSONException {
 		
 		ArrayList<SocialLink> sll  = new ArrayList<SocialLink>();
 		sll.addAll(db.findAll());
