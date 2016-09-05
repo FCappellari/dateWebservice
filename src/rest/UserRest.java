@@ -71,10 +71,10 @@ public class UserRest {
 		  //Login login = new Gson().fromJson(j, Login[].class); 
 		  
 		  JSONObject json = new JSONObject(j);
-		  
+		  JSONObject location =  json.getJSONObject("location");
 		  if(!controller.hasUser(json.getLong("id")))
-			  controller.createUserJson(json.getString("accessToken"));
-		  else controller.updateUser(json.getLong("id"), json.getString("accessToken"));
+			  controller.createUserJson(json.getString("accessToken"),location);
+		  else controller.updateUser(json.getLong("id"), json.getString("accessToken"), location);
 		  return Response.status(200).build();
 	}
 	
@@ -98,7 +98,7 @@ public class UserRest {
 	public Response updateUser(String param) throws IOException, JSONException{ 
 		JSONObject j = new JSONObject(param);
 		
-		if(controller.updateUser(j.getLong("id"), j.getString("accessToken")))
+		if(controller.updateUser(j.getLong("id"), j.getString("accessToken"), j.getJSONObject("location")))
 				return Response.status(200).build();
 		else return Response.status(500).build();	
 		
@@ -110,7 +110,7 @@ public class UserRest {
 		
 		JSONObject j = new JSONObject(param);
 		
-		if(controller.createUserJson(j.getString("accessToken")))
+		if(controller.createUserJson(j.getString("accessToken"), j.getJSONObject("location")))
 			return Response.status(200).build();
 		else return Response.status(500).build();	
 		

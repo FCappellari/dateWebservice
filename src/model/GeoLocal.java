@@ -1,57 +1,29 @@
 package model;
+import java.util.List;
+
+import org.mongodb.morphia.geo.Point;
 
 public class GeoLocal {
 	
-	private String latitude;
-    private String longitude;	
-    private String city;
-    private String country;
-    private String state;
-    private String strert;
-    private String zip;
-     
-	public String getLatitude() {
-		return latitude;
+	private String type; 
+    private List<Double> coordinates;
+	
+    public GeoLocal() {}    
+    
+	public GeoLocal(String string, Point point) {
+		this.setType(type);
+		this.setCoordinates(point.getCoordinates());
 	}
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
+	public String getType() {
+		return type;
 	}
-	public String getLongitude() {
-		return longitude;
+	public void setType(String type) {
+		this.type = type;
 	}
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
+	public List<Double> getCoordinates() {
+		return coordinates;
 	}
-	public String getCity() {
-		return city;
-	}
-	public void setCity(String city) {
-		this.city = city;
-	}
-	public String getCountry() {
-		return country;
-	}
-	public void setCountry(String country) {
-		this.country = country;
-	}
-	public String getState() {
-		return state;
-	}
-	public void setState(String state) {
-		this.state = state;
-	}
-	public String getStrert() {
-		return strert;
-	}
-	public void setStrert(String strert) {
-		this.strert = strert;
-	}
-	public String getZip() {
-		return zip;
-	}
-	public void setZip(String zip) {
-		this.zip = zip;
+	public void setCoordinates(List<Double> coordinates) {
+		this.coordinates = coordinates;
 	} 
-     
-     
 }

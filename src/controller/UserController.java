@@ -1,8 +1,5 @@
 package controller;
 
-
-
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,12 +11,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.geo.GeoJson;
 
 import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 import com.mongodb.util.JSON;
 
+import model.GeoLocal;
 import model.Music;
 import model.Photo;
 import model.Setting;
@@ -32,7 +33,7 @@ import model.UserSocialLink.VISIBILITY;
 import persistence.UserPersistence;
 import persistence.UserSocialLinkPersistence;
 import utils.FbApp;
-
+import utils.GeoUtils;
 
 public class UserController {
 		static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
@@ -55,7 +56,7 @@ public class UserController {
 	    	return gson.toJson(users);	    	      
 	    }	
 
-	    private User prepareUser(Long id) throws IOException, JSONException{
+	    private User prepareUser(Long id, JSONObject location) throws IOException, JSONException{
 	    	
 	    	//SocialLinkController scc = new SocialLinkController();	    			
 	    	
@@ -78,6 +79,7 @@ public class UserController {
 			PhotoController       photoController = new PhotoController();
 			PreferenceController  preferenceController = new PreferenceController();
 			
+			
 			System.out.println(new Date().toString());		
 			
 			System.out.println(new Date().toString());
@@ -92,7 +94,10 @@ public class UserController {
 			
 			user.setName(basicDataJson.getString("name"));
 			user.setFbId(basicDataJson.getLong("id"));
-			user.setGender(basicDataJson.getString("gender"));			
+			user.setGender(basicDataJson.getString("gender"));
+			
+			user.setLocation(location.getDouble("latitude"),location.getDouble("longitude"));					
+					
 			System.out.println(new Date().toString());
 			
 			
@@ -140,7 +145,7 @@ public class UserController {
 	    	return userPhotos;	    	
 	    }
 	    
-		public boolean createUserJson(String shortAccessToken) throws IOException, JSONException {
+		public boolean createUserJson(String shortAccessToken, JSONObject location) throws IOException, JSONException {
 			  
 			accessToken = extendAccessToken(shortAccessToken);
 			
@@ -150,7 +155,7 @@ public class UserController {
 			 * Processos especificos de criação ou atualização devem ser colocados 
 			 * fora do metodo prepareUser 
 			 */			
-			User user = prepareUser(null);
+			User user = prepareUser(null, location);
 			
 			List<SocialLink> socialLinks;
 			SocialLinkController scc = new SocialLinkController();
@@ -187,6 +192,8 @@ public class UserController {
 			userProfileJson.put("coverPicUrl", user.getCoverPictureUrl());					
 			userProfileJson.put("photos", getUserPhotos(user));
 			userProfileJson.put("bio", user.getBio());
+			userProfileJson.put("latitude", user.getLocation().getLatitude());
+			userProfileJson.put("longitude", user.getLocation().getLongitude());
 			
 			JSONArray arraySc = new JSONArray();
 			JSONObject jsc = new JSONObject();
@@ -299,9 +306,8 @@ public class UserController {
 			//user.setSocialLinks(socialLinks);
 			SugestionController sugestionController = new SugestionController();
 			
-			List<Sugestion> sugestions = sugestionController.getUserSugestion(user);
+			//List<Sugestion> sugestions = sugestionController.getUserSugestion(user);
 			
-						
 			JSONObject profileJson = getProfile(user);
 									
 			return profileJson.toString();
@@ -362,14 +368,14 @@ public class UserController {
 			db.updateUserLastLogin(id);
 		}
 
-		public boolean updateUser(long idUser, String shortAccessToken) throws JSONException, IOException {			
+		public boolean updateUser(long idUser, String shortAccessToken, JSONObject location) throws JSONException, IOException {			
 			
 			accessToken = extendAccessToken(shortAccessToken);
 			
 			if(true){
 			//if(hasToUpdateBasedOnLastLogin(idUser)){						
 				try {
-					User user = prepareUser(idUser);
+					User user = prepareUser(idUser, location);
 					
 					return db.updateUser(idUser, user);
 				} catch (IOException e) {
@@ -407,8 +413,9 @@ public class UserController {
 				
 			setting.setMininumAge(Jsettings.getInt("beginAge"));
 			setting.setMaximumAge(Jsettings.getInt("finalAge"));
-			setting.setLatitude("-29.176338");
-			setting.setLongitude("-51.203105");			
+			setting.setLatitude(Jsettings.getString("latitude"));
+			setting.setLongitude(Jsettings.getString("longitude"));			
+			setting.setRadius(Jsettings.getInt("distance"));
 			
 			User u = db.findById(j.getLong("id"));
 			
@@ -434,7 +441,7 @@ public class UserController {
 				my_obj.put("choice", s.getSexPreference());
 				my_obj.put("beginAge", String.valueOf(s.getMininumAge()));
 				my_obj.put("finalAge", String.valueOf(s.getMaximumAge()));
-				my_obj.put("distance", "50");
+				my_obj.put("distance", String.valueOf(s.getRadius()));
 			}
 			
 			return my_obj.toString();

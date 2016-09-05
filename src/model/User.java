@@ -32,17 +32,26 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.mongodb.DBObject;
+import com.mongodb.client.model.geojson.Point;
 import com.mongodb.util.JSON;
 import com.mongodb.util.Util;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.IndexOptions;
+import org.mongodb.morphia.annotations.Indexed;
+import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Property;
 import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.annotations.Transient;
+import org.mongodb.morphia.geo.GeoJson;
 import org.bson.types.ObjectId;
-
+import org.mongodb.morphia.utils.IndexDirection;
+import org.mongodb.morphia.utils.IndexType;
 @Entity
+@Indexes(@Index(name="loc", fields= @Field(value = "location", type = IndexType.GEO2DSPHERE)))
 public class User{
 
     @Id 
@@ -53,7 +62,10 @@ public class User{
     private int age;
     private String gender; 
     private long locationId;
-    private String location;  
+    
+    //@Transient
+    @Indexed(value=IndexDirection.GEO2DSPHERE)    
+    private org.mongodb.morphia.geo.Point location;
     private String bio;
     
     private byte[] picture;  
@@ -132,16 +144,6 @@ public class User{
 	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
-
-	public String getLocation() {
-		return location;
-	}
-
-	public void setLocation(String location) {
-		this.location = location;
-	}
-	
-
 
 	public List<Interest> getInterests() {
 		return interests;
@@ -236,4 +238,32 @@ public class User{
 	public void setBio(String bio) {
 		this.bio = bio;
 	}
+
+	public void setLocation(List<Double> location) {
+		//this.location = location;
+	}
+
+	public void setLocation(double lat, double lon) {
+
+		this.location = GeoJson.point(lat, lon);
+		
+		/*
+		JSONArray cord = new JSONArray();		
+		this.location = new JSONObject();
+		
+		this.location.put("type", "Point");
+		cord.put(0, lon);
+		cord.put(0, lat);		
+		this.location.put("coordinates", cord);
+		*/
+	}
+
+	public org.mongodb.morphia.geo.Point getLocation() {
+		return location;
+	}
+
+	public void setLocation(org.mongodb.morphia.geo.Point location) {
+		this.location = location;
+	}
 }
+

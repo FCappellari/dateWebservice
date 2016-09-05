@@ -7,6 +7,7 @@ import com.mongodb.util.JSON;
 import model.Interest;
 import model.Setting;
 import model.User;
+import utils.GeoUtils;
 import utils.Util;
 
 import java.util.List;
@@ -21,12 +22,17 @@ import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.aggregation.GeoNear.GeoNearBuilder;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.Shape;
+import org.mongodb.morphia.query.Shape.Point;
 import org.mongodb.morphia.query.UpdateOperations;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,13 +100,19 @@ public class UserPersistence extends BasicDAO<User, String> {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public List<User> findUserBySetting(Setting set){
 		List<User> result = new ArrayList<User>();
 		
-		if (set.getSexPreference().toString() == "BOTH"){
-			result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).asList();
-		}
-		else result = ds.find(User.class).filter("age >", set.getMininumAge()).filter("age <", set.getMaximumAge()).filter("gender =", set.getSexPreference().toString()).asList();		
+		Point center = new Point(Double.parseDouble(set.getLongitude()), Double.parseDouble(set.getLatitude()));
+		
+		Shape circle = Shape.centerSphere(center, (GeoUtils.generateRadius(set.getRadius())));
+		
+		//111.12 earth curvature degree
+		Query q = ds.createQuery(User.class).field("location")
+				.within(circle);		
+			
+		result = q.asList();
 		
 		return result;	
 	}

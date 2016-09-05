@@ -11,6 +11,7 @@ public class Setting {
 	private String latitude;
 	private String longitude;
 	private SexPreference sexPreference;
+	private int radius; 
 	
 	public enum SexPreference {
 	    MALE, FEMALE, BOTH;	
@@ -47,5 +48,13 @@ public class Setting {
 	}
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+
+	public int getRadius() {
+		return radius;
+	}
+
+	public void setRadius(int radius) {
+		this.radius = radius;
 	}
 }
