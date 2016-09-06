@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,9 +23,17 @@ public class SocialLinkRest {
 	private SocialLinkController controller = new SocialLinkController();	
 
 	@GET  
-	@Path("/getSocialLinks")		
-	public String findAllSocialLinks() throws JSONException{ 
-		return controller.findAllSocialLinks().toString();
+	@Path("/{id:[0-9][0-9]*}/getSocialLinks")		
+	public String findAllSocialLinks(@PathParam("id") long id) throws JSONException{ 
+		
+		return controller.findAllSocialLinks(id).toString();
+	} 
+
+	@GET  
+	@Path("/{id:[0-9][0-9]*}/getUserSocialLinks")		
+	public String findAllUserSocialLinks(@PathParam("id") long id) throws JSONException{ 
+		
+		return controller.findAllUserSocialLinks(id).toString();
 	} 
 	
 	@POST

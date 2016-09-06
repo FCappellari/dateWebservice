@@ -66,10 +66,46 @@ public class SocialLinkController {
 		return j;		
 	}
 	
-	public String findAllSocialLinks() throws JSONException {
-		
+	public String findAllSocialLinks(long id) throws JSONException {
+		ArrayList<UserSocialLink> sle  = new ArrayList<UserSocialLink>();
 		ArrayList<SocialLink> sll  = new ArrayList<SocialLink>();
+		ArrayList<SocialLink> sll2  = new ArrayList<SocialLink>();
+		UserController uc = new UserController();
+		User u = uc.findUserById(id);
+		
+		sle.addAll(dbUser.findUserSocialLinks(u));
+		
+		sll2.addAll(db.findAll());
+		
+		if(u.getSocialLinks() == null)
+			return socialLinksToJson(sll2).toString(); //caso o usuario n tenha nenhuma sociallink retorna todas para adicionar
+		
+		for (SocialLink socialLink : sll2) {
+		     for (UserSocialLink userSocialLink : sle)   
+			    if (socialLink.getIdSocialLink() != userSocialLink.getSocialLink().getIdSocialLink()) {
+		            sll.add(socialLink);
+		        }
+		}
+		
+		return socialLinksToJson(sll).toString();
+	}
+	
+	public String findAllUserSocialLinks(long id) throws JSONException {
+		ArrayList<UserSocialLink> sle  = new ArrayList<UserSocialLink>();
+		ArrayList<SocialLink> sll  = new ArrayList<SocialLink>();
+		UserController uc = new UserController();
+		User u = uc.findUserById(id);
+		
+		sle.addAll(dbUser.findUserSocialLinks(u));
+			
 		sll.addAll(db.findAll());
+
+		for (SocialLink socialLink : sll) {
+		     for (UserSocialLink userSocialLink : sle)   
+			    if (socialLink.getIdSocialLink() != userSocialLink.getSocialLink().getIdSocialLink()) {
+		            sll.remove(socialLink);
+		        }
+		}
 		
 		return socialLinksToJson(sll).toString();
 	}
@@ -97,7 +133,6 @@ public class SocialLinkController {
 		
 		return null;
 	}
-	
 
 	
 }

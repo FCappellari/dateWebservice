@@ -36,18 +36,5 @@ public class UserSocialLinkPersistence extends BasicDAO<UserSocialLink, String>{
 		
 		return result;		
 	}
-	
-	public UserSocialLink findUserSocialLinkById(User u, Long id){
-		
-		UserSocialLink userLink = new UserSocialLink();
-		
-		if(u.getSocialLinks()!=null)
-			for (UserSocialLink usl : u.getSocialLinks()){
-				if (usl.getSocialLink().getIdSocialLink() == id)
-				    return usl; 
-			}
-		
-		return null;
-	}
     
 }

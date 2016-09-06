@@ -39,10 +39,13 @@ public class UserController {
 		static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
 		static MongoClient client = new MongoClient(uri);
 		static Morphia morphia = new Morphia().map(User.class);
+		static Morphia morphia2 = new Morphia().map(UserSocialLink.class);
 		
 		Datastore ds = morphia.createDatastore(client, "teste");
+		Datastore dsUserSocialLink = morphia2.createDatastore(client, "teste");
 	    private Gson gson = new Gson(); 
 	    private UserPersistence db = new UserPersistence(ds);
+	    private UserSocialLinkPersistence dbUserSocialLink = new UserSocialLinkPersistence(dsUserSocialLink);
 	    private String accessToken;
 	    private ArrayList<String> interestParams;
 	    
@@ -78,7 +81,6 @@ public class UserController {
 			PlaceController       placeController =  new PlaceController();
 			PhotoController       photoController = new PhotoController();
 			PreferenceController  preferenceController = new PreferenceController();
-			
 			
 			System.out.println(new Date().toString());		
 			
@@ -476,6 +478,35 @@ public class UserController {
 			}else{
 				u.getSocialLinks().add(usl);
 			}
+			if(db.updateUser(u))
+				return true;
+			return false;
+		}
+		
+		public boolean editSocialLink(JSONObject j) throws JSONException {			
+			User u = db.findById(j.getLong("userId"));
+			UserSocialLink usl = dbUserSocialLink.findUserSocialLinkById(u,j.getJSONObject("socialLink").getLong("id"));
+			
+			u.getSocialLinks().remove(usl);
+			
+			if(j.getJSONObject("socialLink").getBoolean("onlytomatches"))
+				usl.setVisibility(VISIBILITY.ONLYMATCHES);
+			else if(j.getJSONObject("socialLink").getBoolean("everyone"))
+				usl.setVisibility(VISIBILITY.EVERYONE);
+			
+			u.getSocialLinks().add(usl);
+			
+			if(db.updateUser(u))
+				return true;
+			return false;
+		}
+		
+		public boolean deleteSocialLink(JSONObject j) throws JSONException {			
+			User u = db.findById(j.getLong("userId"));
+			UserSocialLink usl = dbUserSocialLink.findUserSocialLinkById(u,j.getJSONObject("socialLink").getLong("id"));
+			
+			u.getSocialLinks().remove(usl);
+			
 			if(db.updateUser(u))
 				return true;
 			return false;

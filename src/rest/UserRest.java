@@ -140,6 +140,30 @@ public class UserRest {
 	}
 	
 	@POST
+	@Path("/editSocialLink")	
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response editSocialLink(String param) throws IOException, JSONException{ 
+		JSONObject j = new JSONObject(param);
+		
+		if(controller.editSocialLink(j))
+				return Response.status(200).build();
+		else return Response.status(500).build();	
+		
+	}
+
+	@POST
+	@Path("/deleteSocialLink")	
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteSocialLink(String param) throws IOException, JSONException{ 
+		JSONObject j = new JSONObject(param);
+		
+		if(controller.deleteSocialLink(j))
+				return Response.status(200).build();
+		else return Response.status(500).build();	
+		
+	}
+	
+	@POST
 	@Path("/updatePhoto")	
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updatePhoto(String param) throws IOException, JSONException{ 

@@ -266,4 +266,3 @@ public class User{
 		this.location = location;
 	}
 }
-
