@@ -40,12 +40,9 @@ import java.util.List;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.dao.BasicDAO;
 
-public class UserPersistence extends BasicDAO<User, String> {
-	
-	static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
-    static MongoClient client = new MongoClient(uri);
-    static Morphia morphia = new Morphia().map(User.class);
-    Datastore ds = morphia.createDatastore(client, "teste");
+public class UserPersistence extends BasicDAO<User, String> {	
+
+    Datastore ds =  MongoDBHelper.INSTANCE.getDatastore();
     
     public UserPersistence(Datastore ds) {
 		super(ds);
@@ -142,6 +139,14 @@ public class UserPersistence extends BasicDAO<User, String> {
 		
 		return true;
 		
+	}
+
+	public List<User> findById(long userId, long sugestionId) {
+		
+		Query<User> query = ds.find(User.class);
+		query.or(query.criteria("fbId").equal(userId), query.criteria("fbId").equal(sugestionId));		
+						
+		return query.asList();
 	}	
 }
 

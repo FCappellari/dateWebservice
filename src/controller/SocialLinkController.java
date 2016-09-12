@@ -7,33 +7,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Key;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.query.Query;
+
 
 import com.google.gson.Gson;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 
 import model.SocialLink;
 import model.User;
 import model.UserSocialLink;
+import persistence.MongoDBHelper;
 import persistence.SocialLinkPersistence;
 import persistence.UserPersistence;
 import persistence.UserSocialLinkPersistence;
 
 public class SocialLinkController {
 	
-	static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
-	static MongoClient client = new MongoClient(uri);
-	static Morphia morphia = new Morphia().map(SocialLink.class);
-	static Morphia morphia2 = new Morphia().map(UserSocialLink.class);
-	
-	Datastore ds = morphia.createDatastore(client, "teste");
-	Datastore dsUser = morphia2.createDatastore(client, "teste");
+	Datastore ds = MongoDBHelper.INSTANCE.getDatastore();	
     private Gson gson = new Gson(); 
     private SocialLinkPersistence db = new SocialLinkPersistence(ds);
-    private UserSocialLinkPersistence dbUser = new UserSocialLinkPersistence(dsUser);
+    private UserSocialLinkPersistence dbUser = new UserSocialLinkPersistence(ds);
     
 	public List<SocialLink> getFirstSocialLink(){
 		

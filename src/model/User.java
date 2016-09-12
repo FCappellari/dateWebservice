@@ -19,6 +19,7 @@ package model;
 import java.io.File;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,9 @@ import com.mongodb.DBObject;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.util.JSON;
 import com.mongodb.util.Util;
+
+import utils.FbApp;
+
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Embedded;
@@ -78,7 +82,9 @@ public class User{
     private List<Interest> interests;     
     
     @Embedded
-    private List<Photo> photos;    
+    private List<Photo> photos;
+    @Embedded
+    private List<MusicGender> musicGenders;
 
     private List<Music> music;
     
@@ -264,5 +270,25 @@ public class User{
 
 	public void setLocation(org.mongodb.morphia.geo.Point location) {
 		this.location = location;
+	}
+
+	public List<MusicGender> getMusicGenders() {
+		return musicGenders;
+	}
+
+	public void setMusicGenders(List<MusicGender> musicGenders) {
+		this.musicGenders = musicGenders;
+	}
+
+	public String getPictureUrl(String accessToken2) {
+		// TODO Auto-generated method stub
+		try {
+			FbApp.httpGetPicture(this.getPictureUrl());
+		} catch (Exception e) {
+			FbApp.buildUrlToGetPhoto(this.getFbId(), accessToken2);
+		}
+		
+		
+		return null;
 	}
 }

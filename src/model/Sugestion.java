@@ -1,13 +1,17 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mongodb.morphia.annotations.Reference;
 
-public class Sugestion {
+public class Sugestion implements Comparable<Sugestion>{
 	
 	@Reference
 	private User user;
 	private int percentage;
 	private String preferencesInConnom;
+	private List<Interest> interestsInConnom;
 	
 	public User getUser() {
 		return user;
@@ -26,6 +30,32 @@ public class Sugestion {
 	}
 	public void setPreferencesInConnom(String preferencesInConnom) {
 		this.preferencesInConnom = preferencesInConnom;
+	}
+	public List<Interest> getInterestsInConnom() {
+		return interestsInConnom;
+	}
+	public void setInterestsInConnom(List<Interest> interestsInConnom) {
+		this.interestsInConnom = interestsInConnom;
+	}
+	public void setInterestsInConnom(Interest interestsInConnom) {
+		if(this.interestsInConnom==null)
+			this.interestsInConnom = new ArrayList<Interest>();
+		this.interestsInConnom.add(interestsInConnom);
+	}
+	@Override
+	public int compareTo(Sugestion o) {
+		// TODO Auto-generated method stub
+		if((interestsInConnom==null)&&(o.getInterestsInConnom()==null))
+			return 0;
+		
+		if(interestsInConnom==null){
+			return (0 - o.getInterestsInConnom().size());
+		}
+		
+		if(o.getInterestsInConnom()==null){
+			return interestsInConnom.size() - 0;
+		}
+		return (interestsInConnom.size() - o.getInterestsInConnom().size());
 	}
 	
 

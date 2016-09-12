@@ -19,8 +19,7 @@ import model.UserSocialLink;
 
 public class UserSocialLinkPersistence extends BasicDAO<UserSocialLink, String>{
 
-	Datastore ds =  MongoDBHelper.INSTANCE.getDatastore();
-	
+    
     public UserSocialLinkPersistence(Datastore ds) {
 		super(ds);
 		// TODO Auto-generated constructor stub
@@ -36,19 +35,6 @@ public class UserSocialLinkPersistence extends BasicDAO<UserSocialLink, String>{
 			}
 		
 		return result;		
-	}
-	
-	public UserSocialLink findUserSocialLinkById(User u, Long id){
-		
-		UserSocialLink userLink = new UserSocialLink();
-		
-		if(u.getSocialLinks()!=null)
-			for (UserSocialLink usl : u.getSocialLinks()){
-				if (usl.getSocialLink().getIdSocialLink() == id)
-				    return usl; 
-			}
-		
-		return null;
 	}
     
 }

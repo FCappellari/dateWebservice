@@ -21,7 +21,9 @@ import com.mongodb.client.model.geojson.Position;
 import com.mongodb.util.JSON;
 
 import model.GeoLocal;
+import model.Interest;
 import model.Music;
+import model.MusicGender;
 import model.Photo;
 import model.Setting;
 import model.Setting.SexPreference;
@@ -30,22 +32,17 @@ import model.Sugestion;
 import model.User;
 import model.UserSocialLink;
 import model.UserSocialLink.VISIBILITY;
+import persistence.MongoDBHelper;
 import persistence.UserPersistence;
 import persistence.UserSocialLinkPersistence;
 import utils.FbApp;
 import utils.GeoUtils;
 
 public class UserController {
-		static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
-		static MongoClient client = new MongoClient(uri);
-		static Morphia morphia = new Morphia().map(User.class);
-		static Morphia morphia2 = new Morphia().map(UserSocialLink.class);
 		
-		Datastore ds = morphia.createDatastore(client, "teste");
-		Datastore dsUserSocialLink = morphia2.createDatastore(client, "teste");
-	    private Gson gson = new Gson(); 
+		Datastore ds = MongoDBHelper.INSTANCE.getDatastore();	     
 	    private UserPersistence db = new UserPersistence(ds);
-	    private UserSocialLinkPersistence dbUserSocialLink = new UserSocialLinkPersistence(dsUserSocialLink);
+	    private UserSocialLinkPersistence dbUserSocialLink = new UserSocialLinkPersistence(ds);
 	    private String accessToken;
 	    private ArrayList<String> interestParams;
 	    
@@ -53,12 +50,12 @@ public class UserController {
 	    	return db.findById(id); 	    	      
 	    }  
 
-	    public String findAllOrderedByName() {	    	
+	 /*   public String findAllOrderedByName() {	    	
 	    	
 	    	List<User> users = db.findAll();	    	
 	    	return gson.toJson(users);	    	      
 	    }	
-
+*/
 	    private User prepareUser(Long id, JSONObject location) throws IOException, JSONException{
 	    	
 	    	//SocialLinkController scc = new SocialLinkController();	    			
@@ -69,6 +66,8 @@ public class UserController {
 	    	
 	    	ArrayList<String> interestParams = setInterestsParams();		
 			ArrayList<String> placeParams    = setPlaceParams();
+			List<Music> music = null;
+			ArrayList<MusicGender> musicGenders = new ArrayList<MusicGender>(); 
 			
 			JSONObject basicDataJson = getUserBasicDataAsJson();
 			JSONObject interestsJson = getUserInterestsAsJson(interestParams);			
@@ -100,8 +99,7 @@ public class UserController {
 			
 			user.setLocation(location.getDouble("latitude"),location.getDouble("longitude"));					
 					
-			System.out.println(new Date().toString());
-			
+			System.out.println(new Date().toString());			
 			
 			user.setInterests(interestController.biuldInterests(placesJson.getJSONObject("tagged_places"), "tagged_places"));
 			System.out.println(new Date().toString());
@@ -113,22 +111,12 @@ public class UserController {
 				}
 			}			
 			
-			List<Music> music = null;
-			try {	
-				System.out.println(new Date().toString());
-			       music = preferenceController.getMusic(user.getInterests(), accessToken);
-			       System.out.println(new Date().toString());
-			       
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+						
+			music = preferenceController.getMusic(user.getInterests(), accessToken);
+			musicGenders = preferenceController.getMusicGenders(music);
 			
 			user.setMusic(music);		
-			
+			user.setMusicGenders(musicGenders);
 			//user.setPicture(convertPicToByte(getUserPicture()));		
 			
 			user.setPictureUrl(getUserPictureAsUrl());
@@ -184,7 +172,9 @@ public class UserController {
 			return FbApp.httpGetRequest(FbApp.buildUrl("picture", accessToken));			
 		}	
 		
-		public JSONObject getProfile(User user) throws JSONException {
+		public JSONObject getProfile(User user, List<Interest> list) throws JSONException {
+			
+			String interestsAux = "";
 			
 			JSONObject userProfileJson = new JSONObject();
 			userProfileJson.put("name", user.getName());		
@@ -197,17 +187,30 @@ public class UserController {
 			userProfileJson.put("latitude", user.getLocation().getLatitude());
 			userProfileJson.put("longitude", user.getLocation().getLongitude());
 			
-			JSONArray arraySc = new JSONArray();
-			JSONObject jsc = new JSONObject();
+			if(list != null){	
+				JSONArray arrayIc = new JSONArray();				
+				
+				for (Interest interest : list) {
+					JSONObject jic = new JSONObject();
+					jic.put("name", interest.getName());
+					jic.put("relevance", interest.getRelevance());
+					arrayIc.put(jic);
+				}				
+				userProfileJson.put("interestsInConnom", arrayIc);
+			}
+			
+			JSONArray arraySc = new JSONArray();			
 			if(user.getSocialLinks() != null){			
 			
-				for (UserSocialLink sc : user.getSocialLinks()) {				
+				for (UserSocialLink sc : user.getSocialLinks()) {	
+					JSONObject jsc  = new JSONObject();
 					jsc.put("name", sc.getSocialLink().getName());
 					jsc.put("id", sc.getSocialLink().getIdSocialLink());
 					jsc.put("link", sc.getLink());
 					jsc.put("visibility", sc.getVisibility());
+					arraySc.put(jsc);
 				}
-				arraySc.put(jsc);
+				
 				userProfileJson.put("socialLinks", arraySc);
 				
 			}
@@ -249,11 +252,13 @@ public class UserController {
 		}
 
 		private ArrayList<String> setInterestsParams() {
-			
-			interestParams = new ArrayList<String>();			 
-			interestParams.add("music");
-			interestParams.add("movies");			
-			interestParams.add("books");
+
+			//nao colocar espaço nos parametros
+			interestParams = new ArrayList<String>();
+			interestParams.add("music"); 
+			//interestParams.add("music");			
+			/*interestParams.add("movies");			
+			interestParams.add("books");*/
 			//interestParams.add("sports");
 			
 			return interestParams;
@@ -298,23 +303,47 @@ public class UserController {
 			return basicUserInformation;
 		}
 
-		public String getUserProfleById(long id) throws JSONException {
+		public String getUserProfleById(long sugestionId, long userId) throws JSONException {
+			System.out.println("begin getUserProfleById = " + new Date());
+			List<User> res = db.findById(userId, sugestionId); 
+			User user = null;
+			User sugestion = null;
 			
-			User user = db.findById(id);
+			for (User u : res) {
+				if(u.getFbId()==userId){
+					user = u;					
+				}else if(u.getFbId()==sugestionId){
+					sugestion = u;
+				}
+			}			
 			
-			if(new SocialLinkController().getUserSocialLinks(user) != null)
-				user.setSocialLinks(new SocialLinkController().getUserSocialLinks(user));			
+			if(new SocialLinkController().getUserSocialLinks(sugestion) != null)
+				user.setSocialLinks(new SocialLinkController().getUserSocialLinks(sugestion));			
 			
 			//user.setSocialLinks(socialLinks);
 			SugestionController sugestionController = new SugestionController();
 			
 			//List<Sugestion> sugestions = sugestionController.getUserSugestion(user);
 			
-			JSONObject profileJson = getProfile(user);
-									
+			JSONObject profileJson = getProfile(sugestion, getSugestionINterestsInConnom(user, sugestion));
+			
+			System.out.println("end getUserProfleById = " + new Date());
+			
 			return profileJson.toString();
 		}
 		
+		private List<Interest> getSugestionINterestsInConnom(User user, User sugestion) {
+			
+			ArrayList<Interest> res = new ArrayList<Interest>();
+			
+			for (Sugestion s : user.getSugestions()) {
+				if(sugestion.getFbId()==s.getUser().getFbId()){
+					return s.getInterestsInConnom();
+				}					
+			}	
+			return null;
+		}
+
 		public String extendAccessToken(String shortAccessToken) throws IOException, JSONException {	
 			
 			String urlString = "https://graph.facebook.com/v2.5"
@@ -345,7 +374,7 @@ public class UserController {
 			if((current.getSugestions()==null)||current.getSugestions().isEmpty()){
 				sugestions = sugestionController.getUserSugestion(current);
 			}else{
-				sugestions = current.getSugestions();
+				sugestions = sugestionController.getUserSugestion(current);
 			}
 			
 			JSONArray sugestionsJson = new JSONArray();	
@@ -356,10 +385,12 @@ public class UserController {
 				my_obj.put("name", sugestion.getUser().getName());
 				my_obj.put("interestsInCommon", sugestion.getPreferencesInConnom());
 				my_obj.put("photos", sugestion.getUser().getPhotos().get(0).getSizes().get(0).getUrl());
-				my_obj.put("profilePic", sugestion.getUser().getPictureUrl());
+				my_obj.put("profilePic", sugestion.getUser().getPictureUrl(accessToken));
 				sugestionsJson.put(my_obj);
 			}			
 			
+			current.setSugestions(sugestions);
+			db.updateUser(current);
 			updateUserLastLogin(current.getFbId());
 
 			return sugestionsJson;
@@ -570,5 +601,17 @@ public class UserController {
 			db.updateUser(u);
 			
 			return true;
+		}
+
+		public String getUserProfleById(long id) {
+			// TODO Auto-generated method stub
+			User user = db.findById(id);			
+			
+			if(new SocialLinkController().getUserSocialLinks(user) != null)
+				user.setSocialLinks(new SocialLinkController().getUserSocialLinks(user));			
+
+			JSONObject profileJson = getProfile(user, null);
+									
+			return profileJson.toString();
 		}
 }

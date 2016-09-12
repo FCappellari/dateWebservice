@@ -8,6 +8,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,8 +30,9 @@ public class UserRest {
 	
 	@GET  
 	@Produces({MediaType.APPLICATION_JSON})	
-	public String findAllUsers(){ 
-		return controller.findAllOrderedByName().toString();
+	public String findAllUsers(){
+		return null; 
+		//return controller.findAllOrderedByName().toString();
 	} 
 	
 	
@@ -43,11 +45,19 @@ public class UserRest {
 	}
 	
 	@GET
+	@Path("profile")	
+	public String getUserProfleById(@QueryParam("sugestion") long sugestionId, @QueryParam("user") long userId) throws JSONException{ 
+		
+		return controller.getUserProfleById(sugestionId, userId);
+	}
+	
+	@GET
 	@Path("/{id:[0-9][0-9]*}/profile")	
 	public String getUserProfleById(@PathParam("id") long id) throws JSONException{ 
 		
 		return controller.getUserProfleById(id);
 	}
+	
 	
 	@GET
 	@Path("/{id:[0-9][0-9]*}/settings")	

@@ -17,7 +17,7 @@ public class FbApp {
 	
 	private static long appId = 973158726110069L;
 	private static String appSecret = "d6da159210c713c50c11164e759e2f5d";	
-	private static String version = "v2.5";
+	private static String version = "v2.7";
 	 
 	private static FbApp instancia; //Declaramos um objeto privado e estático 'instancia'  
 	  
@@ -57,7 +57,7 @@ public class FbApp {
 		url = url + "&access_token=" + accessToken;	                 
 		
 		return url;		
-	}
+	}	
 	
 	public static String buildUrlToGetPhoto(String param, String accessToken){		
 		
@@ -200,6 +200,19 @@ public class FbApp {
 		
 		return url;		
 	}
+
+	public static String buildUrlToGetPhoto(long param, String accessToken) {
+		
+		String url = "https://graph.facebook.com/" +
+	                 version + "/";
+				     		
+		url = url + param + "/?fields=images";				
+		
+		url = url + "&access_token=" + accessToken;	                 
+		
+		return url;		
+	}
+	
 }
 
  

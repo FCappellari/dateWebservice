@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONException;
@@ -10,6 +11,8 @@ import org.json.JSONObject;
 
 import model.Interest;
 import model.Music;
+import model.MusicGender;
+import persistence.UserPersistence;
 import utils.FbApp;
 
 public class PreferenceController {
@@ -29,7 +32,20 @@ public class PreferenceController {
 		
 		List<Music> listMusic = new ArrayList<Music>();
 		
-		params = "name%2Cartists_we_like%2Cawards%2Cband_interests%2Cband_members%2Cbio%2Cbirthday%2Cbooking_agent%2Ccan_post%2Ccategory%2Ccategory_list%2Ccompany_overview%2Cculinary_team%2Ccurrent_location%2Cdescription%2Cdescription_html%2Cfood_styles%2Cfounded%2Cgeneral_info%2Cgenre%2Chometown%2Chours%2Cid%2Cinfluences%2Ckeywords%2Clocation%2Cmission%2Cmpg%2Cnetwork%2Cnew_like_count%2Cfeatures%2Cemails%2Cparking%2Cpersonal_info%2Cpersonal_interests%2Cpharma_safety_info%2Cphone%2Cprice_range%2Cproduced_by%2Cproducts%2Cpublic_transit%2Crecord_label%2Crestaurant_services%2Crestaurant_specialties%2Cschedule%2Cscreenplay_by%2Cseason%2Cstarring%2Cstudio%2Ctalking_about_count%2Ccover%2Cdirected_by%2Cwritten_by%2Clink%2Calbums".split("%2C");
+		String paramsString = "name%2C"		
+				+ "band_interests%2C"
+				+ "band_members%2C"
+				+ "bio%2C"				
+				+ "category%2C"
+				+ "category_list%2C"				
+				+ "description%2C"
+				+ "genre%2C"
+				+ "id%2C"
+				+ "influences%2C"
+				+ "keywords%2C";
+		
+		params = paramsString.split("%2C");
+		
 		List<String> ids = new ArrayList<String>();
 		
 		//FbApp.buildUrl(params, accessToken, id);
@@ -64,7 +80,42 @@ public class PreferenceController {
 			m.setBio(musicJson.getString("bio"));
 		if(!musicJson.isNull("category"))
 			m.setCategory(musicJson.getString("category"));		
+		if(!musicJson.isNull("genre"))
+			m.setGenre(musicJson.getString("genre"));
 	 
 		return m;
 	}
+	
+	public ArrayList<MusicGender> getMusicGenders(List<Music> music){
+		
+		ArrayList<MusicGender> musicgGendersUnrelevants = new ArrayList<MusicGender>();
+		ArrayList<MusicGender> musicgGendersWithRelevance = new ArrayList<MusicGender>();
+		
+		for (Music m : music) {
+			musicgGendersUnrelevants.add(new MusicGender(m.getGenre()));
+		}
+		MusicGender mg = null;
+		
+		genderOuterLoop:
+		for (Iterator<MusicGender> iterator = musicgGendersUnrelevants.iterator(); iterator.hasNext(); ){
+		
+			mg = iterator.next();
+			
+			for (MusicGender mgwr : musicgGendersWithRelevance) {
+				
+				if(mgwr.getName().equals(mg.getName())){
+					mgwr.setRelevance(mgwr.getRelevance() + 1);
+					iterator.remove();
+					continue genderOuterLoop;
+				}
+				
+			}	
+			
+			musicgGendersWithRelevance.add(mg);
+		}	
+		
+		return musicgGendersWithRelevance;
+		
+	}
+	
 }

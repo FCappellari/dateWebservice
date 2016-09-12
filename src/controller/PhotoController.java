@@ -13,26 +13,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
-
 import model.Photo;
 import model.Size;
 import utils.CustomComparator;
 import utils.FbApp;
 
-public class PhotoController {
-	
-	static MongoClientURI uri  = new MongoClientURI("mongodb://sa:sa@ds045054.mongolab.com:45054/teste"); 
-	static MongoClient client = new MongoClient(uri);	
-	
-	@SuppressWarnings("deprecation")
-	DB db = client.getDB(uri.getDatabase());
+public class PhotoController {	
 
 	public List<Photo> getUserPhotos(JSONObject json, String accessToken) throws JSONException, IOException {
 		
