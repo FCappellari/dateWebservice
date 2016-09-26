@@ -43,17 +43,16 @@ public class PhotoController {
 		JSONObject sizesJson;
 		List<Photo> result = new ArrayList<Photo>();
 		
+		
 		for (Photo photo : topTenPhotos) {
 			sizesJson = FbApp.httpGetRequest(FbApp.buildUrlToGetPhoto(String.valueOf(photo.getId()), accessToken));
-			
+			List<Size> sizes = new ArrayList<Size>();	
 			for (int i = 0; i < sizesJson.getJSONArray("images").length(); i++) {
-				JSONObject node = sizesJson.getJSONArray("images").getJSONObject(i);
-				
-				List<Size> sizes = new ArrayList<Size>();
-				sizes.add(new Size(node.getInt("height"), node.getInt("width"), node.getString("source")));
-				
-				photo.setSizes(sizes);
+				JSONObject node = sizesJson.getJSONArray("images").getJSONObject(i);						
+				sizes.add(new Size(node.getInt("height"), node.getInt("width"), node.getString("source")));		
 			}
+			
+			photo.setSizes(sizes);
 			result.add(photo);
 		}
 		
@@ -85,7 +84,7 @@ public class PhotoController {
 				
 				list.add(p);				
 			}			
-		}		
+		}			
 		return list;		
 	}
 	

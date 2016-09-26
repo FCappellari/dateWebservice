@@ -2,33 +2,29 @@ package controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.geo.GeoJson;
 
-import com.google.gson.Gson;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.model.geojson.Point;
-import com.mongodb.client.model.geojson.Position;
-import com.mongodb.util.JSON;
-
-import model.GeoLocal;
 import model.Interest;
+import model.Match;
 import model.Music;
 import model.MusicGender;
 import model.Photo;
+import model.Place;
 import model.Setting;
 import model.Setting.SexPreference;
 import model.SocialLink;
 import model.Sugestion;
+import model.Sugestion.STATUS;
 import model.User;
 import model.UserSocialLink;
 import model.UserSocialLink.VISIBILITY;
@@ -36,7 +32,6 @@ import persistence.MongoDBHelper;
 import persistence.UserPersistence;
 import persistence.UserSocialLinkPersistence;
 import utils.FbApp;
-import utils.GeoUtils;
 
 public class UserController {
 		
@@ -49,7 +44,11 @@ public class UserController {
 	    public User findUserById(long id){	    		    	
 	    	return db.findById(id); 	    	      
 	    }  
-
+	    
+	    public UserPersistence getDB(){
+	    	return db;
+	    }
+	    
 	 /*   public String findAllOrderedByName() {	    	
 	    	
 	    	List<User> users = db.findAll();	    	
@@ -67,6 +66,7 @@ public class UserController {
 	    	ArrayList<String> interestParams = setInterestsParams();		
 			ArrayList<String> placeParams    = setPlaceParams();
 			List<Music> music = null;
+			List<Place> places = null;
 			ArrayList<MusicGender> musicGenders = new ArrayList<MusicGender>(); 
 			
 			JSONObject basicDataJson = getUserBasicDataAsJson();
@@ -113,9 +113,11 @@ public class UserController {
 			
 						
 			music = preferenceController.getMusic(user.getInterests(), accessToken);
+			places = preferenceController.getPlace(placesJson);
 			musicGenders = preferenceController.getMusicGenders(music);
 			
 			user.setMusic(music);		
+			user.setPlaces(places);
 			user.setMusicGenders(musicGenders);
 			//user.setPicture(convertPicToByte(getUserPicture()));		
 			
@@ -222,25 +224,56 @@ public class UserController {
 			
 			List<Photo> photos = user.getPhotos();
 			JSONArray photosJson = new JSONArray();
-			
-			for (Photo photo : photos) {
+			List<Photo> aux = null;
+			boolean pegarFotosFacebook = false;
+
+			//MELHORA A PERFORMANCE MAS TRAS FOTOS DESATUALIZADAS
+			boolean considerarBase = true; 
+			if(considerarBase)
+				for (Photo photo : photos) {
 				
-				/*
-				 * Se o campo base64 esta nao vazio quer dizer que o usuario ja
-				 * atualizaou a foto entao deve considerar a foto que o usuario atualizou 
-				 * e nao a URL da foto do facebook
-				 */		
-				if((photo.getBase64()!= null)&&(!photo.getBase64().equals(""))){
-					photosJson.put(photo.getBase64());
-				}else{
-					photosJson.put(photo.getSizes().get(0).getUrl());
+					/*
+					 * Se o campo base64 esta nao vazio quer dizer que o usuario ja
+					 * atualizaou a foto entao deve considerar a foto que o usuario atualizou 
+					 * e nao a URL da foto do facebook
+					 */		
+					if((photo.getBase64()!= null)&&(!photo.getBase64().equals(""))){
+						photosJson.put(photo.getBase64());
+					}else{
+						if(FbApp.testUrl(photo.getSizes().get(0).getUrl())){
+							photosJson.put(photo.getSizes().get(0).getUrl());
+						}else{
+							pegarFotosFacebook = true;
+							break;
+						}					
+					}
+				}
+			else pegarFotosFacebook = true;
+			
+			if(pegarFotosFacebook){
+				try {
+					photos = new PhotoController().getUserPhotos(getUserPhotosAsJson(user.getFbId()), accessToken);
+				} catch (JSONException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				for (Photo photo : photos) {
+					
+					/*
+					 * Se o campo base64 esta nao vazio quer dizer que o usuario ja
+					 * atualizaou a foto entao deve considerar a foto que o usuario atualizou 
+					 * e nao a URL da foto do facebook
+					 */		
+					if((photo.getBase64()!= null)&&(!photo.getBase64().equals(""))){
+						photosJson.put(photo.getBase64());
+					}else{				
+						photosJson.put(photo.getSizes().get(0).getUrl());
+					}
 				}
 			}
-			
 			return photosJson;
-		}
-		
-		
+		}		
 
 		private ArrayList<String> setPlaceParams() {
 			
@@ -303,8 +336,11 @@ public class UserController {
 			return basicUserInformation;
 		}
 
-		public String getUserProfleById(long sugestionId, long userId) throws JSONException {
+		public String getUserProfleById(long sugestionId, long userId, String shortAccessToken) throws JSONException, IOException {
 			System.out.println("begin getUserProfleById = " + new Date());
+			
+			accessToken = extendAccessToken(shortAccessToken);
+			
 			List<User> res = db.findById(userId, sugestionId); 
 			User user = null;
 			User sugestion = null;
@@ -337,6 +373,7 @@ public class UserController {
 			ArrayList<Interest> res = new ArrayList<Interest>();
 			
 			for (Sugestion s : user.getSugestions()) {
+				if(s.getUser()==null) continue;
 				if(sugestion.getFbId()==s.getUser().getFbId()){
 					return s.getInterestsInConnom();
 				}					
@@ -362,9 +399,15 @@ public class UserController {
 		private JSONObject getUserPhotosAsJson() throws IOException{
 			return FbApp.httpGetRequest(FbApp.biuldPhotosUrl(accessToken));
 		}
+		
+		private JSONObject getUserPhotosAsJson(long id) throws IOException{
+			return FbApp.httpGetRequest(FbApp.biuldPhotosUrl(id, accessToken));
+		}		
 
-		public JSONArray getUserSugestoinsById(long id) throws JSONException {
+		/* sugestao que vai pra tela*/
+		public JSONArray getUserSugestoinsById(long id, String accessToken2) throws JSONException, IOException {
 
+			accessToken = extendAccessToken(String.valueOf(accessToken2));
 			User current = db.findById(id);
 			SugestionController sugestionController = new SugestionController();
 			List<Sugestion> sugestions = null;
@@ -382,18 +425,37 @@ public class UserController {
 			for (Sugestion sugestion : sugestions) {				
 				JSONObject my_obj = new JSONObject();
 				my_obj.put("id", sugestion.getUser().getFbId());
-				my_obj.put("name", sugestion.getUser().getName());
+				my_obj.put("name", sugestion.getUser().getName().split(" ")[0]); // primeiro nome
 				my_obj.put("interestsInCommon", sugestion.getPreferencesInConnom());
 				my_obj.put("photos", sugestion.getUser().getPhotos().get(0).getSizes().get(0).getUrl());
 				my_obj.put("profilePic", sugestion.getUser().getPictureUrl(accessToken));
+				my_obj.put("status", checkIfSugestionLikedCurrentUser(sugestion, current));
+				my_obj.put("percentage", sugestion.getPercentage());
 				sugestionsJson.put(my_obj);
-			}			
+			}		
 			
-			current.setSugestions(sugestions);
-			db.updateUser(current);
 			updateUserLastLogin(current.getFbId());
 
 			return sugestionsJson;
+		}
+
+		private String checkIfSugestionLikedCurrentUser(Sugestion sugestion, User current) {
+			
+			List<Sugestion> ss = sugestion.getUser().getSugestions();
+			
+			if(ss==null)
+				return STATUS.UNSET.toString();
+			
+			for (Sugestion s : ss) {		
+				if(s.getUser() == null) continue;
+				if(s.getUser().getFbId()==current.getFbId()){
+					if(s.getStatus() == null)
+						return STATUS.UNSET.toString();
+					return s.getStatus().toString();
+				}
+			}
+			
+			return STATUS.UNSET.toString();
 		}
 
 		private void updateUserLastLogin(long id) {			
@@ -613,5 +675,110 @@ public class UserController {
 			JSONObject profileJson = getProfile(user, null);
 									
 			return profileJson.toString();
+		}
+
+		public boolean like(JSONObject j) throws IllegalAccessException, InvocationTargetException {
+			
+			long userId;
+			long sugestionId;
+			
+			userId = j.getLong("userId");
+			sugestionId = j.getLong("sugestionId");
+			STATUS statusFromClient = STATUS.valueOf(j.getString("status")); 	
+			
+			List<User> res = db.findById(userId, sugestionId); 
+			User user = null;
+			User sugestion = null;
+			
+			for (User u : res) {
+				if(u.getFbId()==userId){
+					user = u;					
+				}else if(u.getFbId()==sugestionId){
+					sugestion = u;
+				}
+			}
+			
+			List<Sugestion> userSugestions = user.getSugestions();
+			
+			for (Sugestion s : userSugestions) {
+				if(s.getUser().getFbId() == sugestionId){
+					s.setStatus(STATUS.LIKED);
+					
+					if(statusFromClient == STATUS.LIKED){
+						createMatch(user, s);
+					}
+				}
+			}
+			
+			user.setSugestions(userSugestions);
+			
+			db.updateUser(user);
+			
+			return true;
+		}
+
+		private void createMatch(User user, Sugestion s) throws IllegalAccessException, InvocationTargetException {
+			
+			Match m = new Match();						
+			BeanUtils.copyProperties(m, s);
+			user.setMatches(m);
+			
+			Match m2 = new Match();
+			Sugestion s2 = s.getUser().getSugestionByFbId(user.getFbId());
+			
+			BeanUtils.copyProperties(m2, s2);
+			s.getUser().setMatches(m2);			
+			
+			db.updateUsers(user, s.getUser());
+		}
+
+		public String getUserMatches(long userId, String shortAccessToken) throws JSONException, IOException {
+			
+			accessToken = extendAccessToken(shortAccessToken);
+			String res = "";
+			
+			User u = db.findById(userId);
+			
+			if (u.getMatches() != null)
+				res = buildClientMatchJson(u.getMatches()).toString();
+			
+			return res;
+		}
+
+		/* match que vai pra tela */
+		private JSONObject buildClientMatchJson(List<Match> matches) {
+			
+			JSONObject res = new JSONObject();
+			JSONArray matchesJson = new JSONArray();	
+			
+			for (Match m : matches) {				
+				JSONObject my_obj = new JSONObject();
+				my_obj.put("id", m.getUser().getFbId());
+				my_obj.put("name", m.getUser().getName()); 
+				my_obj.put("interestsInCommon", getInterestsInCommon(m));
+				my_obj.put("photos", m.getUser().getPhotos().get(0).getSizes().get(0).getUrl());
+				my_obj.put("profilePic", m.getUser().getPictureUrl(accessToken));
+				my_obj.put("percentage", m.getPercentage());				
+				matchesJson.put(my_obj);
+			}			
+				
+			res.put("matches", matchesJson);
+			
+			return res;
+		}
+
+		private JSONArray getInterestsInCommon(Match m) {			
+			
+			JSONArray interestsJson = new JSONArray();
+			
+			for (Interest i : m.getInterestsInConnom()) {
+				JSONObject my_obj = new JSONObject();
+				my_obj.put("name", i.getName());
+				my_obj.put("relevance", i.getRelevance());
+				my_obj.put("type", i.getTipo());
+				interestsJson.put(my_obj);
+			} 
+			
+			return interestsJson;
 		}
 }

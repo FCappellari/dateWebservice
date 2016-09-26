@@ -7,11 +7,16 @@ import org.mongodb.morphia.annotations.Reference;
 
 public class Sugestion implements Comparable<Sugestion>{
 	
-	@Reference
+	@Reference(ignoreMissing=true)
 	private User user;
 	private int percentage;
 	private String preferencesInConnom;
 	private List<Interest> interestsInConnom;
+	private STATUS status;
+	
+	public enum STATUS {
+	    UNSET, LIKED, DISLIKED;	
+    }
 	
 	public User getUser() {
 		return user;
@@ -44,7 +49,7 @@ public class Sugestion implements Comparable<Sugestion>{
 	}
 	@Override
 	public int compareTo(Sugestion o) {
-		// TODO Auto-generated method stub
+
 		if((interestsInConnom==null)&&(o.getInterestsInConnom()==null))
 			return 0;
 		
@@ -57,6 +62,11 @@ public class Sugestion implements Comparable<Sugestion>{
 		}
 		return (interestsInConnom.size() - o.getInterestsInConnom().size());
 	}
-	
+	public STATUS getStatus() {
+		return status;
+	}
+	public void setStatus(STATUS status) {
+		this.status = status;
+	}	
 
 }

@@ -6,12 +6,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import model.Interest;
 import model.Music;
 import model.MusicGender;
+import model.Place;
 import persistence.UserPersistence;
 import utils.FbApp;
 
@@ -115,6 +117,21 @@ public class PreferenceController {
 		}	
 		
 		return musicgGendersWithRelevance;
+		
+	}
+
+	public List<Place> getPlace(JSONObject placesJson) {
+		
+		JSONArray places = placesJson.getJSONObject("tagged_places").getJSONArray("data");
+		ArrayList<Place> ps = new ArrayList<Place>();
+		
+		for (int i = 0; i < places.length() ; i++) {
+			Place p = new Place();
+			p.setName(places.getJSONObject(i).getJSONObject("place").getString("name"));
+			ps.add(p);
+		}
+		
+		return ps;
 		
 	}
 	

@@ -17,6 +17,7 @@
 package model;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,7 +59,7 @@ import org.mongodb.morphia.utils.IndexType;
 @Indexes(@Index(name="loc", fields= @Field(value = "location", type = IndexType.GEO2DSPHERE)))
 public class User{
 
-    @Id 
+    @Id
     private ObjectId id;
     
     private long fbId;
@@ -83,13 +84,21 @@ public class User{
     
     @Embedded
     private List<Photo> photos;
+    
+    @Embedded
+    private List<Place> places;
+    
     @Embedded
     private List<MusicGender> musicGenders;
 
+    @Embedded
     private List<Music> music;
     
     @Embedded    
     private List<Sugestion> sugestions;
+
+    @Embedded    
+    private List<Match> matches;
     
     @Transient
     private String accessToken;   
@@ -187,7 +196,7 @@ public class User{
 		this.photos = photos;
 	}
 
-	public List<Photo> getPhotos() {
+	public List<Photo> getPhotos() {			
 		return photos;
 	}
 
@@ -281,14 +290,49 @@ public class User{
 	}
 
 	public String getPictureUrl(String accessToken2) {
-		// TODO Auto-generated method stub
-		try {
-			FbApp.httpGetPicture(this.getPictureUrl());
-		} catch (Exception e) {
-			FbApp.buildUrlToGetPhoto(this.getFbId(), accessToken2);
+		
+		//if(!FbApp.testUrl(this.getPictureUrl())){
+		if(true){
+			try {
+				JSONObject a = FbApp.httpGetRequest(FbApp.buildUrlToGetPhoto(this.getFbId(), accessToken2));
+				return a.getJSONObject("picture").getJSONObject("data").getString("url");
+			} catch (JSONException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else return this.getPictureUrl();
+		
+		return null;		
+		
+	}
+
+	public List<Match> getMatches() {
+		return matches;
+	}
+
+	public void setMatches(List<Match> matches) {
+		this.matches = matches;
+	}
+	
+	public void setMatches(Match match) {
+		if(this.matches==null)
+			this.matches = new ArrayList<Match>();
+		this.matches.add(match);
+	}
+	
+	public Sugestion getSugestionByFbId(long id){
+		for (Sugestion s : sugestions) {
+			if(s.getUser().getFbId() == id)
+				return s;
 		}
-		
-		
 		return null;
 	}
+
+	public List<Place> getPlaces() {
+		return places;
+	}
+
+	public void setPlaces(List<Place> places) {
+		this.places = places;
+	}	
 }

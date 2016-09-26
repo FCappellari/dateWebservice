@@ -1,5 +1,6 @@
 package rest;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.persistence.Entity;
 import javax.ws.rs.Consumes;
@@ -46,9 +47,9 @@ public class UserRest {
 	
 	@GET
 	@Path("profile")	
-	public String getUserProfleById(@QueryParam("sugestion") long sugestionId, @QueryParam("user") long userId) throws JSONException{ 
+	public String getUserProfleById(@QueryParam("sugestion") long sugestionId, @QueryParam("user") long userId, @QueryParam("accessToken") String accessToken) throws JSONException, IOException{ 
 		
-		return controller.getUserProfleById(sugestionId, userId);
+		return controller.getUserProfleById(sugestionId, userId, accessToken);
 	}
 	
 	@GET
@@ -67,10 +68,10 @@ public class UserRest {
 	}
 	
 	@GET
-	@Path("/{id:[0-9][0-9]*}/sugestions")	
-	public String getUserSugestoinsById(@PathParam("id") long id) throws JSONException{ 
+	@Path("sugestions")	
+	public String getUserSugestoinsById(@QueryParam("id") long id, @QueryParam("accessToken") String accessToken) throws JSONException, IOException{ 
 		
-		return controller.getUserSugestoinsById(id).toString();
+		return controller.getUserSugestoinsById(id, accessToken).toString();
 	}
 	
 	@POST
@@ -200,6 +201,26 @@ public class UserRest {
 		else return Response.status(500).build();	
 		
 	}
+	
+	@POST
+	@Path("/like")	
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response like(String param) throws IOException, JSONException, IllegalAccessException, InvocationTargetException{ 
+		JSONObject j = new JSONObject(param);
+		
+		if(controller.like(j))
+			return Response.status(200).build();
+		else return Response.status(500).build();	
+		
+	}
+	
+	@GET
+	@Path("matches")	
+	public String getUserMatches(@QueryParam("user") long userId, @QueryParam("accessToken") String accessToken) throws JSONException, IOException{ 
+		
+		return controller.getUserMatches(userId, accessToken);
+	}
+	
 } 
 
 

@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.imageio.ImageIO;
 
@@ -201,17 +203,50 @@ public class FbApp {
 		return url;		
 	}
 
+	public static String biuldPhotosUrl(long id, String accessToken){
+		
+		String url = "https://graph.facebook.com/" +
+           	  version + "/" + id +
+           	  "?fields=albums{photos.limit(100){likes.limit(0).summary(true)},id}";		
+	
+		url = url + "&access_token=" + accessToken;
+		
+		return url;		
+	}
+
 	public static String buildUrlToGetPhoto(long param, String accessToken) {
 		
 		String url = "https://graph.facebook.com/" +
 	                 version + "/";
 				     		
-		url = url + param + "/?fields=images";				
+		url = url + param + "/?fields=picture.width(800).height(800){url}";				
 		
 		url = url + "&access_token=" + accessToken;	                 
 		
 		return url;		
 	}
+	
+	public static boolean testUrl(String urlString){
+		int code = 0;
+		
+		try{
+			URL url = new URL(urlString);
+			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.connect();
+
+			code = connection.getResponseCode();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		if(code!=200)	
+			return false;
+		return true;
+	}
+
+
+	
 	
 }
 

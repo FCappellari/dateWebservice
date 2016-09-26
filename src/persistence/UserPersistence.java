@@ -147,6 +147,13 @@ public class UserPersistence extends BasicDAO<User, String> {
 		query.or(query.criteria("fbId").equal(userId), query.criteria("fbId").equal(sugestionId));		
 						
 		return query.asList();
+	}
+
+	public void updateUsers(User user, User user2) {
+		
+		updateUser(user);
+		updateUser(user2);
+		
 	}	
 }
 

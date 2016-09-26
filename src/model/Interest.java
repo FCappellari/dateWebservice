@@ -75,7 +75,7 @@ public class Interest {
 
 	    if (object != null && object instanceof Interest)
 	    {
-	        isEqual = (this.name == ((Interest) object).name);
+	        isEqual = (this.name.equals(((Interest) object).getName()));
 	    }
 
 	    return isEqual;
