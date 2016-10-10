@@ -412,8 +412,7 @@ public class UserController {
 			SugestionController sugestionController = new SugestionController();
 			List<Sugestion> sugestions = null;
 			List<String> sugestionResult = new ArrayList<String>();
-			
-			
+						
 			if((current.getSugestions()==null)||current.getSugestions().isEmpty()){
 				sugestions = sugestionController.getUserSugestion(current);
 			}else{
@@ -434,8 +433,11 @@ public class UserController {
 				sugestionsJson.put(my_obj);
 			}		
 			
+			System.out.println("Antes UpdateLastLogin" + new Date().toString());
+			
 			updateUserLastLogin(current.getFbId());
 
+			System.out.println("Depois UpdateLastLogin" + new Date().toString());
 			return sugestionsJson;
 		}
 
@@ -767,7 +769,7 @@ public class UserController {
 			return res;
 		}
 
-		private JSONArray getInterestsInCommon(Match m) {			
+		private JSONArray getInterestsInCommon(Match m) {			 
 			
 			JSONArray interestsJson = new JSONArray();
 			
@@ -781,4 +783,15 @@ public class UserController {
 			
 			return interestsJson;
 		}
+
+		public boolean hasSettings(long userId, String accessToken2) {
+			
+			User u = findUserById(userId);
+			
+			if(u.getSetting() == null)
+				return false;			
+			return true;
+		}
+		
+		
 }

@@ -97,31 +97,32 @@ public class SugestionController {
 				/*
 				 * 	Musica
 				 */
-				List<Music> musics = user.getMusic();				
-				for (Music music : musics) {
-					for (Music currentMusic : currentMusics) {						
-						//Verifica musica igual
-						if(music.getName().equals(currentMusic.getName())){							
-											
-							Interest i = new Interest();
-							
-							i.setName(music.getName());
-							i.setRelevance(setpercentage(musics.size(), 10, currentMusics.size(), 10));
-			     			i.setTipo("music");
-							
-			     			if(sugestion.getInterestsInConnom()!=null)			     			
-			     				if(sugestion.getInterestsInConnom().contains(i))
-			     					continue;						
-			     			
-							sugestion.setPreferencesInConnom(currentMusic.getName()+";");
-							sugestion.setInterestsInConnom(i);
-							
-							potentialUsers.add(user);
-							addToSugestionList(sugestion);
-						}											
-					}
-				}				
-				
+				if(user.getMusic()!= null){
+					List<Music> musics = user.getMusic();				
+					for (Music music : musics) {
+						for (Music currentMusic : currentMusics) {						
+							//Verifica musica igual
+							if(music.getName().equals(currentMusic.getName())){							
+												
+								Interest i = new Interest();
+								
+								i.setName(music.getName());
+								i.setRelevance(setpercentage(musics.size(), 10, currentMusics.size(), 10));
+								i.setTipo("music");
+								
+								if(sugestion.getInterestsInConnom()!=null)			     			
+									if(sugestion.getInterestsInConnom().contains(i))
+										continue;						
+								
+								sugestion.setPreferencesInConnom(currentMusic.getName()+";");
+								sugestion.setInterestsInConnom(i);
+								
+								potentialUsers.add(user);
+								addToSugestionList(sugestion);
+							}											
+						}
+					}				
+				}	
 				/*
 				 * Generos
 				 */				

@@ -221,6 +221,13 @@ public class UserRest {
 		return controller.getUserMatches(userId, accessToken);
 	}
 	
+	@GET
+	@Path("hasSettings")	
+	public String hasSettings(@QueryParam("id") long userId, @QueryParam("accessToken") String accessToken) throws JSONException, IOException{ 
+		
+		return String.valueOf(controller.hasSettings(userId, accessToken));
+	}
+	
 } 
 
 
