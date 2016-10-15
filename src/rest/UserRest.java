@@ -228,6 +228,13 @@ public class UserRest {
 		return String.valueOf(controller.hasSettings(userId, accessToken));
 	}
 	
+	@GET
+	@Path("/updateAllUsers")	
+	public String updateAllUsers(@QueryParam("accessToken") String accessToken) throws JSONException, IOException{		  
+		  
+		  return String.valueOf(controller.updateAll(accessToken));  
+	}
+	
 } 
 
 

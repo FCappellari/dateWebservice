@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.joda.time.LocalDate;
+import org.joda.time.Period;
+import org.joda.time.Years;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,9 +99,15 @@ public class UserController {
 			user.setName(basicDataJson.getString("name"));
 			user.setFbId(basicDataJson.getLong("id"));
 			user.setGender(basicDataJson.getString("gender"));
+			user.setAge(generateAge(basicDataJson.getString("birthday")));
 			
-			user.setLocation(location.getDouble("latitude"),location.getDouble("longitude"));					
-					
+			if(location!=null){				
+				user.setLocation(location.getDouble("latitude"),location.getDouble("longitude"));					
+			}else{
+				user.setLocation(-29.1690939, -51.1945756);				
+			}
+				
+			
 			System.out.println(new Date().toString());			
 			
 			user.setInterests(interestController.biuldInterests(placesJson.getJSONObject("tagged_places"), "tagged_places"));
@@ -328,6 +337,7 @@ public class UserController {
 			params.add("id");
 			params.add("name");			
 			params.add("gender");
+			params.add("birthday");
 			
 			String url = FbApp.buildUrl(params, accessToken);
 		
@@ -791,6 +801,31 @@ public class UserController {
 			if(u.getSetting() == null)
 				return false;			
 			return true;
+		}
+		
+		public int generateAge(String birthday){
+			
+			int month = Integer.valueOf(birthday.substring(0,2));
+			int day = Integer.valueOf(birthday.substring(3,5));
+			int year = Integer.valueOf(birthday.substring(6,10));
+			
+			LocalDate birth = new LocalDate(year,month, day);
+			LocalDate now = new LocalDate();
+			
+			return Years.yearsBetween(birth, now).getYears();
+		}
+
+		public String updateAll(String shortAccessToken) throws JSONException, IOException {
+			
+			//extendAccessToken(shortAccessToken);
+			
+			List<User> us = db.findAll();		
+
+			for (User u : us) {
+				updateUser(u.getFbId(), shortAccessToken, null);
+			}
+			
+			return "foi";			
 		}
 		
 		

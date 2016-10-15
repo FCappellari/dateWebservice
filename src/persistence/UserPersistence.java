@@ -82,9 +82,16 @@ public class UserPersistence extends BasicDAO<User, String> {
 	
 	public User findById(long id){
 		String query = "fbId =";
-		long value = id;		
+		long value = id;	
+		User u = null;
 		
-		return ds.find(User.class, query, value ).asList().get(0);
+		u = ds.find(User.class, query, value ).asList().get(0);
+		
+		if (u == null)
+			u = ds.find(User.class, query, value ).asList().get(0);
+		
+		
+		return u;
 	}
 
 	public boolean hasUser(long id) {	

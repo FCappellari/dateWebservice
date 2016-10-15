@@ -19,6 +19,7 @@ import model.Interest;
 import model.Music;
 import model.MusicGender;
 import model.Place;
+import model.Setting.SexPreference;
 import model.Sugestion;
 import model.Sugestion.STATUS;
 import model.User;
@@ -58,6 +59,8 @@ public class SugestionController {
 		ArrayList<Sugestion> resSugestionList = new ArrayList<Sugestion>();
 		int sugestionLimit = 10;
 		int k = 0;
+		
+		users = filterByAgeAndGender(users);
 		
 		current.setSugestions(removeMissingReferencesByFbId(users));
 				
@@ -100,26 +103,28 @@ public class SugestionController {
 				if(user.getMusic()!= null){
 					List<Music> musics = user.getMusic();				
 					for (Music music : musics) {
-						for (Music currentMusic : currentMusics) {						
-							//Verifica musica igual
-							if(music.getName().equals(currentMusic.getName())){							
-												
-								Interest i = new Interest();
+						for (Music currentMusic : currentMusics) {						    
+						    if(music.getName().equals(currentMusic.getName())){	//Verifica musica igual
+						    	
+						       if (music.getName().equals("Sem genero"))
+						    	   continue;
+						     				
+							   Interest i = new Interest();
 								
-								i.setName(music.getName());
-								i.setRelevance(setpercentage(musics.size(), 10, currentMusics.size(), 10));
-								i.setTipo("music");
+							   i.setName(music.getName());
+							   i.setRelevance(setpercentage(musics.size(), 10, currentMusics.size(), 10));
+							   i.setTipo("music");
 								
-								if(sugestion.getInterestsInConnom()!=null)			     			
-									if(sugestion.getInterestsInConnom().contains(i))
-										continue;						
+							   if(sugestion.getInterestsInConnom()!=null)			     			
+								  if(sugestion.getInterestsInConnom().contains(i))
+								     continue;						
 								
-								sugestion.setPreferencesInConnom(currentMusic.getName()+";");
-								sugestion.setInterestsInConnom(i);
+							   sugestion.setPreferencesInConnom(currentMusic.getName()+";");
+							   sugestion.setInterestsInConnom(i);
 								
-								potentialUsers.add(user);
-								addToSugestionList(sugestion);
-							}											
+							   potentialUsers.add(user);
+							   addToSugestionList(sugestion);
+						   }
 						}
 					}				
 				}	
@@ -130,26 +135,31 @@ public class SugestionController {
 				if(sugestionMgs!=null){
 					for (MusicGender mg : currentMusicGenders) {
 						for (MusicGender smg : sugestionMgs) {
-							if(mg.getName().equals(smg.getName())){								
-								if(currentMusicGenders.contains(smg.getName()))
-									continue;
+							{ //verifica se o registro e valido
+							   if(mg.getName().equals(smg.getName())){
+								  if(currentMusicGenders.contains(smg.getName()))
+									 continue;
+								  
+								  if(mg.getName().equals("Sem genero"))
+									  continue;
 								
-								Interest i = new Interest();
+								  Interest i = new Interest();
 								
-								i.setName(smg.getName());
-								i.setTipo("genre");
-								i.setRelevance(setpercentage(sugestionMgs.size(), smg.getRelevance(), currentMusicGenders.size(), mg.getRelevance()));
+								  i.setName(smg.getName());
+								  i.setTipo("genre");
+								  i.setRelevance(setpercentage(sugestionMgs.size(), smg.getRelevance(), currentMusicGenders.size(), mg.getRelevance()));
 								
-								if(sugestion.getInterestsInConnom()!=null)			     			
-				     				if(sugestion.getInterestsInConnom().contains(i))
-				     					continue;						
+							      if(sugestion.getInterestsInConnom()!=null)			     			
+				     				  if(sugestion.getInterestsInConnom().contains(i))
+				     					  continue;						
 								
-								sugestion.setPreferencesInConnom(smg.getName()+";");						    
-								sugestion.setInterestsInConnom(i);
-								potentialUsers.add(user);
-								addToSugestionList(sugestion);
-															
-							}
+								  sugestion.setPreferencesInConnom(smg.getName()+";");						    
+								  sugestion.setInterestsInConnom(i);
+								  potentialUsers.add(user);
+								  addToSugestionList(sugestion);
+								  						
+							  }
+						   } 	
 						}
 					}				
 				}
@@ -321,6 +331,105 @@ public class SugestionController {
 		}
 		
 		return false;
+	}
+	
+	private List<User> filterByAgeAndGender(List<User> users){
+		
+		ArrayList<User> userSugestions = new ArrayList<User>();
+		ArrayList<User> userSugestionsAux = new ArrayList<User>();
+		String userGender;
+		SexPreference currentUserPreference;
+		User userSugestion = null;
+		
+		userGender = current.getGender();
+		currentUserPreference = current.getSetting().getSexPreference();		
+		
+		for (User user : users){
+			if(user.getFbId()==current.getFbId())
+				continue;
+			
+			if (current.getSetting().getMaximumAge() > user.getAge() ||
+			    current.getSetting().getMininumAge() < user.getAge())
+				userSugestions.add(user);
+		}
+		
+		for (User user : userSugestions) {
+			if (userGender.equals("male")){
+				userSugestion = getSugestionForMale(user, currentUserPreference);
+				if (userSugestion != null)
+					userSugestionsAux.add(userSugestion);
+			}else {
+				userSugestion = getSugestionForFemale(user, currentUserPreference);
+				if (userSugestion != null)
+					userSugestionsAux.add(userSugestion);
+			}
+		}        
+
+		return userSugestions;
+	}
+
+	private User getSugestionForFemale(User user, SexPreference currentUserPreference) {
+		if (currentUserPreference == SexPreference.MALE){
+			if (user.getGender().equals("male")){
+				if (user.getSetting().getSexPreference() == SexPreference.FEMALE){
+					return user;
+				}else if (user.getSetting().getSexPreference() == SexPreference.BOTH){
+					return user;
+				}
+			}
+		}
+		
+		if (currentUserPreference == SexPreference.FEMALE){
+			if (user.getGender().equals("female")){
+				if (user.getSetting().getSexPreference() == SexPreference.FEMALE){
+					return user;
+				}else if (user.getSetting().getSexPreference() == SexPreference.BOTH){
+					return user;
+				}
+			}
+		}
+		
+		if (currentUserPreference == SexPreference.BOTH){
+			if (user.getSetting().getSexPreference() == SexPreference.FEMALE){
+				return user;
+			}else if (user.getSetting().getSexPreference() == SexPreference.BOTH){
+				return user;
+			}
+		}
+		
+		return null;
+	}
+
+	private User getSugestionForMale(User user, SexPreference currentUserPreference) {
+		if (currentUserPreference == SexPreference.FEMALE){
+			if (user.getGender().equals("female")){
+				if (user.getSetting().getSexPreference() == SexPreference.MALE){
+					return user;
+				} else if (user.getSetting().getSexPreference() == SexPreference.BOTH){
+					return user;
+				}
+			}
+		}
+		
+		if (currentUserPreference == SexPreference.MALE){
+			if (user.getGender().equals("male")){
+				if (user.getSetting().getSexPreference() == SexPreference.MALE){
+					return user;
+				} else if (user.getSetting().getSexPreference() == SexPreference.BOTH){
+					return user;
+				}
+			}
+		}
+		
+		if (currentUserPreference == SexPreference.BOTH){
+			if (user.getSetting().getSexPreference() == SexPreference.MALE){
+				return user;
+			}else if (user.getSetting().getSexPreference() == SexPreference.BOTH){
+				return user;
+			}
+		}
+		
+		return null;
 	}
 
 	//	METODO PARA TESTES
