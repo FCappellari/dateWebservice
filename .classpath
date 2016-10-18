@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-client-1.17.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-core-1.17.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-json-1.17.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-server-1.17.jar" sourcepath="C:/Users/Edian/.m2/repository/com/sun/jersey/jersey-server/1.17/jersey-server-1.17-sources.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-server-1.17.jar" sourcepath="C:/Users/Fabrício/.m2/repository/com/sun/jersey/jersey-server/1.17/jersey-server-1.17-sources.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-servlet-1.17.jar" sourcepath="C:/Users/Edian/.m2/repository/com/sun/jersey/jersey-servlet/1.17/jersey-servlet-1.17-sources.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jettison-1.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jsr311-api-1.1.1.jar"/>

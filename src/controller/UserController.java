@@ -188,7 +188,8 @@ public class UserController {
 			String interestsAux = "";
 			
 			JSONObject userProfileJson = new JSONObject();
-			userProfileJson.put("name", user.getName());		
+			userProfileJson.put("name", user.getName());
+			userProfileJson.put("age", user.getAge());
 			userProfileJson.put("gender", user.getGender());
 			userProfileJson.put("location", user.getLocation());
 			userProfileJson.put("pictureUrl", user.getPictureUrl());			
@@ -435,6 +436,7 @@ public class UserController {
 				JSONObject my_obj = new JSONObject();
 				my_obj.put("id", sugestion.getUser().getFbId());
 				my_obj.put("name", sugestion.getUser().getName().split(" ")[0]); // primeiro nome
+				my_obj.put("age", sugestion.getUser().getAge());
 				my_obj.put("interestsInCommon", sugestion.getPreferencesInConnom());
 				my_obj.put("photos", sugestion.getUser().getPhotos().get(0).getSizes().get(0).getUrl());
 				my_obj.put("profilePic", sugestion.getUser().getPictureUrl(accessToken));

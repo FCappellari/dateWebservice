@@ -348,7 +348,7 @@ public class SugestionController {
 			if(user.getFbId()==current.getFbId())
 				continue;
 			
-			if (current.getSetting().getMaximumAge() > user.getAge() ||
+			if (current.getSetting().getMaximumAge() > user.getAge() &&
 			    current.getSetting().getMininumAge() < user.getAge())
 				userSugestions.add(user);
 		}
@@ -365,7 +365,7 @@ public class SugestionController {
 			}
 		}        
 
-		return userSugestions;
+		return userSugestionsAux;
 	}
 
 	private User getSugestionForFemale(User user, SexPreference currentUserPreference) {
