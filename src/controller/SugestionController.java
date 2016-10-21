@@ -348,8 +348,8 @@ public class SugestionController {
 			if(user.getFbId()==current.getFbId())
 				continue;
 			
-			if (current.getSetting().getMaximumAge() > user.getAge() &&
-			    current.getSetting().getMininumAge() < user.getAge())
+			if (current.getSetting().getMaximumAge() >= user.getAge() &&
+			    current.getSetting().getMininumAge() <= user.getAge())
 				userSugestions.add(user);
 		}
 		

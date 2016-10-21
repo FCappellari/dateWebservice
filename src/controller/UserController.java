@@ -336,7 +336,7 @@ public class UserController {
 			ArrayList<String> params = new ArrayList<String>(); 
 			
 			params.add("id");
-			params.add("name");			
+			params.add("name");
 			params.add("gender");
 			params.add("birthday");
 			
@@ -765,7 +765,9 @@ public class UserController {
 			JSONObject res = new JSONObject();
 			JSONArray matchesJson = new JSONArray();	
 			
-			for (Match m : matches) {				
+			for (Match m : matches) {		
+				if(m.getUser() == null) 
+					continue;
 				JSONObject my_obj = new JSONObject();
 				my_obj.put("id", m.getUser().getFbId());
 				my_obj.put("name", m.getUser().getName()); 
