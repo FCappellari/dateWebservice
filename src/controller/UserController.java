@@ -787,11 +787,14 @@ public class UserController {
 			
 			JSONArray interestsJson = new JSONArray();
 			
-			for (Interest i : m.getInterestsInConnom()) {
+			if (m.getInterestsInConnom() == null)
+				return null;
+			
+			for (Interest interest : m.getInterestsInConnom()) {
 				JSONObject my_obj = new JSONObject();
-				my_obj.put("name", i.getName());
-				my_obj.put("relevance", i.getRelevance());
-				my_obj.put("type", i.getTipo());
+				my_obj.put("name", interest.getName());
+				my_obj.put("relevance", interest.getRelevance());
+				my_obj.put("type", interest.getTipo());
 				interestsJson.put(my_obj);
 			} 
 			
