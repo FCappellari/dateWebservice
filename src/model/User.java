@@ -67,6 +67,8 @@ public class User{
     private int age;
     private String gender; 
     private long locationId;
+    private String deviceId;
+    private String ionicEmail;
     
     //@Transient
     @Indexed(value=IndexDirection.GEO2DSPHERE)    
@@ -334,5 +336,21 @@ public class User{
 
 	public void setPlaces(List<Place> places) {
 		this.places = places;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getIonicEmail() {
+		return ionicEmail;
+	}
+
+	public void setIonicEmail(String ionicEmail) {
+		this.ionicEmail = ionicEmail;
 	}	
 }

@@ -1,8 +1,14 @@
 package controller;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -35,6 +41,7 @@ import persistence.MongoDBHelper;
 import persistence.UserPersistence;
 import persistence.UserSocialLinkPersistence;
 import utils.FbApp;
+import utils.Ionic;
 
 public class UserController {
 		
@@ -58,7 +65,7 @@ public class UserController {
 	    	return gson.toJson(users);	    	      
 	    }	
 */
-	    private User prepareUser(Long id, JSONObject location) throws IOException, JSONException{
+	    private User prepareUser(Long id, JSONObject location, String deviceToken, String ionicEmail) throws IOException, JSONException{
 	    	
 	    	//SocialLinkController scc = new SocialLinkController();	    			
 	    	
@@ -100,6 +107,8 @@ public class UserController {
 			user.setFbId(basicDataJson.getLong("id"));
 			user.setGender(basicDataJson.getString("gender"));
 			user.setAge(generateAge(basicDataJson.getString("birthday")));
+			user.setIonicEmail(ionicEmail);
+			user.setDeviceId(deviceToken);
 			
 			if(location!=null){				
 				user.setLocation(location.getDouble("latitude"),location.getDouble("longitude"));					
@@ -146,7 +155,7 @@ public class UserController {
 	    	return userPhotos;	    	
 	    }
 	    
-		public boolean createUserJson(String shortAccessToken, JSONObject location) throws IOException, JSONException {
+		public boolean createUserJson(String shortAccessToken, JSONObject location, String deviceToken, String ionicEmail) throws IOException, JSONException {
 			  
 			accessToken = extendAccessToken(shortAccessToken);
 			
@@ -156,7 +165,7 @@ public class UserController {
 			 * Processos especificos de criação ou atualização devem ser colocados 
 			 * fora do metodo prepareUser 
 			 */			
-			User user = prepareUser(null, location);
+			User user = prepareUser(null, location, deviceToken, ionicEmail);
 			
 			List<SocialLink> socialLinks;
 			SocialLinkController scc = new SocialLinkController();
@@ -477,14 +486,15 @@ public class UserController {
 			db.updateUserLastLogin(id);
 		}
 
-		public boolean updateUser(long idUser, String shortAccessToken, JSONObject location) throws JSONException, IOException {			
+		public boolean updateUser(long idUser, String shortAccessToken, JSONObject location, String deviceToken, String ionicEmail) throws JSONException, IOException {			
 			
 			accessToken = extendAccessToken(shortAccessToken);
-			
-			if(true){
-			//if(hasToUpdateBasedOnLastLogin(idUser)){						
+
+			//testes
+			//if(true){
+			if(hasToUpdateBasedOnLastLogin(idUser)){						
 				try {
-					User user = prepareUser(idUser, location);
+					User user = prepareUser(idUser, location, deviceToken, ionicEmail);
 					
 					return db.updateUser(idUser, user);
 				} catch (IOException e) {
@@ -696,6 +706,8 @@ public class UserController {
 			long userId;
 			long sugestionId;
 			
+			System.out.println("BEGIN MATCH " + new Date().toString());
+			
 			userId = j.getLong("userId");
 			sugestionId = j.getLong("sugestionId");
 			STATUS statusFromClient = STATUS.valueOf(j.getString("status")); 	
@@ -720,18 +732,21 @@ public class UserController {
 					
 					if(statusFromClient == STATUS.LIKED){
 						createMatch(user, s);
+						return true;
 					}
 				}
 			}
 			
 			user.setSugestions(userSugestions);
-			
+			System.out.println("END MATCH BEFORE UPDATE " + new Date().toString());
 			db.updateUser(user);
-			
-			return true;
+			System.out.println("END MATCH AFTER UPDATE " + new Date().toString());
+			return false;
 		}
 
 		private void createMatch(User user, Sugestion s) throws IllegalAccessException, InvocationTargetException {
+			
+			System.out.println("BEGIN CREATE MATCH " + new Date().toString());
 			
 			Match m = new Match();						
 			BeanUtils.copyProperties(m, s);
@@ -743,7 +758,32 @@ public class UserController {
 			BeanUtils.copyProperties(m2, s2);
 			s.getUser().setMatches(m2);			
 			
+			System.out.println("m2 = " + m2.getUser().getName() + "m1 = " +  m.getUser().getName());		
+			
 			db.updateUsers(user, s.getUser());
+			
+			try {
+				notifyUserDevice(s.getUser());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			System.out.println("END CREATE MATCH " + new Date().toString());
+		}
+		
+		private void notifyUserDevice(User user) throws IOException {
+			Ionic i = new Ionic("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZWZmY2I3ZS1kYWRhLTQxOWEtOWQ1OS00YjQ0Njg4NjRlNTIifQ.vi-AOMs8PfBx1__IAohQvaorJox8KIK21VYWoB_6BoE");
+			
+			//Notification Json
+			JSONObject not = new JSONObject();
+			not.put("tokens", user.getDeviceId());
+			not.put("profile", "datepush");
+			JSONObject notDetails = new JSONObject();
+			notDetails.put("title", "YAY");
+			notDetails.put("message", "You have a new DATE!");
+			not.put("notification", notDetails);			
+			
+			System.out.println("RESPONSE = " + i.push(not.toString()));
 		}
 
 		public String getUserMatches(long userId, String shortAccessToken) throws JSONException, IOException {
@@ -788,7 +828,7 @@ public class UserController {
 			JSONArray interestsJson = new JSONArray();
 			
 			if (m.getInterestsInConnom() == null)
-				return null;
+				return null;				
 			
 			for (Interest interest : m.getInterestsInConnom()) {
 				JSONObject my_obj = new JSONObject();
@@ -829,7 +869,7 @@ public class UserController {
 			List<User> us = db.findAll();		
 
 			for (User u : us) {
-				updateUser(u.getFbId(), shortAccessToken, null);
+				//updateUser(u.getFbId(), shortAccessToken, null);
 			}
 			
 			return "foi";			

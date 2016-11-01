@@ -84,8 +84,8 @@ public class UserRest {
 		  JSONObject json = new JSONObject(j);
 		  JSONObject location =  json.getJSONObject("location");
 		  if(!controller.hasUser(json.getLong("id")))
-			  controller.createUserJson(json.getString("accessToken"),location);
-		  else controller.updateUser(json.getLong("id"), json.getString("accessToken"), location);
+			  controller.createUserJson(json.getString("accessToken"),location, json.getString("deviceToken"), json.getString("ionicEmail"));
+		  else controller.updateUser(json.getLong("id"), json.getString("accessToken"), location, json.getString("deviceToken"), json.getString("ionicEmail"));
 		  return Response.status(200).build();
 	}
 	
@@ -108,8 +108,16 @@ public class UserRest {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response updateUser(String param) throws IOException, JSONException{ 
 		JSONObject j = new JSONObject(param);
+		String deviceToken = "";
+		String ionicEmail = "";
 		
-		if(controller.updateUser(j.getLong("id"), j.getString("accessToken"), j.getJSONObject("location")))
+		if(j.has("deviceToken"))
+			deviceToken = j.getString("deviceToken"); 
+		
+		if(j.has("ionicEmail"))
+			ionicEmail = j.getString("ionicEmail");
+			
+		if(controller.updateUser(j.getLong("id"), j.getString("accessToken"), j.getJSONObject("location"), deviceToken, ionicEmail))
 				return Response.status(200).build();
 		else return Response.status(500).build();	
 		
@@ -121,7 +129,16 @@ public class UserRest {
 		
 		JSONObject j = new JSONObject(param);
 		
-		if(controller.createUserJson(j.getString("accessToken"), j.getJSONObject("location")))
+		String deviceToken = "";
+		String ionicEmail = "";
+		
+		if(j.has("deviceToken"))
+			deviceToken = j.getString("deviceToken"); 
+		
+		if(j.has("ionicEmail"))
+			ionicEmail = j.getString("ionicEmail");
+		
+		if(controller.createUserJson(j.getString("accessToken"), j.getJSONObject("location"), deviceToken, ionicEmail))
 			return Response.status(200).build();
 		else return Response.status(500).build();	
 		
@@ -209,8 +226,8 @@ public class UserRest {
 		JSONObject j = new JSONObject(param);
 		
 		if(controller.like(j))
-			return Response.status(200).build();
-		else return Response.status(500).build();	
+			return Response.status(201).build();
+		else return Response.status(200).build();	
 		
 	}
 	

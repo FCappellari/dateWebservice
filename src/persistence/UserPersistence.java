@@ -85,11 +85,13 @@ public class UserPersistence extends BasicDAO<User, String> {
 		long value = id;	
 		User u = null;
 		
-		u = ds.find(User.class, query, value ).asList().get(0);
-		
-		if (u == null)
+		try {
 			u = ds.find(User.class, query, value ).asList().get(0);
-		
+		} catch (Exception e) {
+			System.out.println("Nao encontrou usuario, tentar denovo: *********");
+			if (u == null)
+				u = ds.find(User.class, query, value ).asList().get(0);
+		}
 		
 		return u;
 	}
