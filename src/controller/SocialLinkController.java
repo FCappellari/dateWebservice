@@ -48,7 +48,8 @@ public class SocialLinkController {
 			JSONObject js = new JSONObject();
 			js.put("id", socialLink.getIdSocialLink());
 			js.put("name", socialLink.getName());			
-			js.put("modal", socialLink.isOpenOnModal());			
+			js.put("modal", socialLink.isOpenOnModal());	
+			js.put("contentLabel", socialLink.getContentLabel());
 			jsArray.put(js);
 		}
 		

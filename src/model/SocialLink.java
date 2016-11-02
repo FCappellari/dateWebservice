@@ -14,6 +14,7 @@ public class SocialLink {
     private String created_time;
     private String name;    
     private boolean openOnModal; 
+    private String contentLabel;
 
 	public String getCreated_time() {
 		return created_time;
@@ -46,6 +47,14 @@ public class SocialLink {
 
 	public void setOpenOnModal(boolean openOnModal) {
 		this.openOnModal = openOnModal;
+	}
+
+	public String getContentLabel() {
+		return contentLabel;
+	}
+
+	public void setContentLabel(String contentLabel) {
+		this.contentLabel = contentLabel;
 	}
 
 
