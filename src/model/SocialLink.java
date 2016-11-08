@@ -20,6 +20,28 @@ public class SocialLink {
 		return created_time;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (idSocialLink ^ (idSocialLink >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SocialLink other = (SocialLink) obj;
+		if (idSocialLink != other.idSocialLink)
+			return false;
+		return true;
+	}
+
 	public void setCreated_time(String created_time) {
 		this.created_time = created_time;
 	}

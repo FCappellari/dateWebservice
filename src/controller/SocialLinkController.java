@@ -72,14 +72,13 @@ public class SocialLinkController {
 		if(u.getSocialLinks() == null)
 			return socialLinksToJson(sll2).toString(); //caso o usuario n tenha nenhuma sociallink retorna todas para adicionar
 		
-		for (SocialLink socialLink : sll2) {
-		     for (UserSocialLink userSocialLink : sle)   
-			    if (socialLink.getIdSocialLink() != userSocialLink.getSocialLink().getIdSocialLink()) {
-		            sll.add(socialLink);
-		        }
+		for (UserSocialLink userSocialLink : sle){
+		     sll.add(userSocialLink.getSocialLink());
 		}
 		
-		return socialLinksToJson(sll).toString();
+		sll2.removeAll(sll);
+
+		return socialLinksToJson(sll2).toString();
 	}
 	
 	public String findAllUserSocialLinks(long id) throws JSONException {

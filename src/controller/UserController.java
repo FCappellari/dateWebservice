@@ -219,6 +219,21 @@ public class UserController {
 				}				
 				userProfileJson.put("interestsInConnom", arrayIc);
 			}
+			/*
+			if (user.getSocialLinks() != null){
+				List<UserSocialLink> listSocialLinks = user.getSocialLinks();
+				JSONArray arraySl = new JSONArray();
+				
+				for (UserSocialLink socialLink : listSocialLinks){
+					JSONObject jsl = new JSONObject();
+					jsl.put("name", socialLink.getSocialLink().getName());
+					jsl.put("Visibilidade", socialLink.getVisibility().toString());
+					jsl.put("content", socialLink.getContent().toString());
+					arraySl.put(jsl);
+				}
+				userProfileJson.put("userSocialLinks", arraySl);
+				
+			}*/
 			
 			JSONArray arraySc = new JSONArray();			
 			if(user.getSocialLinks() != null){			
@@ -229,6 +244,7 @@ public class UserController {
 					jsc.put("id", sc.getSocialLink().getIdSocialLink());
 					jsc.put("link", sc.getLink());
 					jsc.put("visibility", sc.getVisibility());
+					jsc.put("content", sc.getContent());
 					arraySc.put(jsc);
 				}
 				
@@ -611,6 +627,8 @@ public class UserController {
 			else if(j.getJSONObject("socialLink").getBoolean("everyone"))
 				usl.setVisibility(VISIBILITY.EVERYONE);
 			
+			usl.setContent(j.getJSONObject("socialLink").getString("content"));
+			
 			u.getSocialLinks().add(usl);
 			
 			if(db.updateUser(u))
@@ -640,6 +658,7 @@ public class UserController {
 				js.put("name", socialLink.getSocialLink().getName());
 				js.put("link", socialLink.getLink());
 				js.put("content", socialLink.getContent());
+				js.put("contentLabel", socialLink.getSocialLink().getContentLabel());
 				js.put("modal", socialLink.getSocialLink().isOpenOnModal());
 				js.put("visibility", socialLink.getVisibility());
 				jsArray.put(js);
@@ -694,7 +713,7 @@ public class UserController {
 			User user = db.findById(id);			
 			
 			if(new SocialLinkController().getUserSocialLinks(user) != null)
-				user.setSocialLinks(new SocialLinkController().getUserSocialLinks(user));			
+				user.setSocialLinks(new SocialLinkController().getUserSocialLinks(user));
 
 			JSONObject profileJson = getProfile(user, null);
 									
